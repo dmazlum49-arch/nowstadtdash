@@ -45,13 +45,12 @@ services:
       - -ec
       - |
         # The uploaded repository has no application code, so there is nothing
-        # to serve yet. Fail fast with an explicit message instead of running a
-        # full Composer install on every restart; the guard clears itself as
-        # soon as app/ and public/index.php exist.
-        if [ ! -f public/index.php ] || [ ! -d app ]; then
-          echo "Application source missing: app/ and public/index.php were never uploaded, so there is no entry point to serve yet." >&2
-          exit 1
-        fi
+        # to serve yet. Wait for it (instead of exiting, which would restart-
+        # loop the container) and start the app automatically once it appears.
+        while [ ! -f public/index.php ] || [ ! -d app ]; do
+          echo "Application source missing: app/ and public/index.php were never uploaded, so there is no entry point to serve yet — waiting for them." >&2
+          sleep 15
+        done
         # Laravel needs these writable directories; the repo does not ship them.
         mkdir -p storage/framework/cache storage/framework/sessions \
                  storage/framework/views storage/app/public storage/logs \

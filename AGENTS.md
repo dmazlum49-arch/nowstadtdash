@@ -41,10 +41,12 @@ block on purpose — nothing there can shadow a dashboard value.
 
 ## State the sandbox left behind
 
-- The `app` service refuses to start while `app/` and `public/index.php` are missing: it
-  prints `Application source missing: app/ and public/index.php were never uploaded…` and
-  exits. The guard is a guard only — as soon as the directories exist, the next restart
-  installs dependencies and starts `php artisan serve` on port 3000 by itself.
+- While `app/` and `public/index.php` are missing, the `app` service stays up and waits
+  (printing `Application source missing: … — waiting for them.` every 15s) instead of
+  exit-looping. It is therefore reported **unhealthy**: nothing can answer on port 3000
+  until the application code exists, and the healthcheck deliberately keeps probing the
+  real entry point rather than a placeholder. As soon as the code is uploaded the same
+  container installs dependencies and starts `php artisan serve` on port 3000 on its own.
 - `composer.lock` was generated *by this sandbox* (`composer update`), because the repo
   shipped none and Composer 2.10 refuses to resolve any Laravel 10 release
   ("affected by security advisories"). `COMPOSER_NO_BLOCKING=1` is set on the `app`
