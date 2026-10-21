@@ -14,7 +14,7 @@ Both times the files were re-assembled into the standard Laravel layout:
 | `database/migrations/` (114 files) | the `YYYY_MM_DD_NNNNNN_*.php` files at the root |
 | `database/{factories,seeders}` | `factories/`, `seeders/` at the root |
 | `resources/views/{admin,user,layouts,emails}` + `resources/views/welcome.blade.php` | the same names at the repository root |
-| `resources/lang/{de,en}` | `lang/` at the root |
+| `resources/lang/{de,en}` | `lang/` at the root — but the upload landed them at `resources/lang/lang/{de,en}`, so **every `__()` key rendered as its raw key** ("admin.dashboard" as the page heading). Moved up to `resources/lang/{en,de}` on 2026-10-21; `app()->langPath()` is `/var/www/html/resources/lang`, so that is where the loader looks. |
 | `resources/{css,js}` | `css/`, `js/` at the root (Vite entry points) |
 | `public/assets/admin/{css,js,images,fonts}` | `public/{css,js,images,fonts}` |
 | `public/assets/admin/libs/{jquery,jquery-validation,metismenu,simplebar,node-waves,toastr,sweetalert2,fancybox,tinymce,datatables.net*}` | the same names directly under `public/` |
@@ -34,15 +34,15 @@ references a path that 404s, compare it with the upload and move the folder.
 | `public/assets/admin/images/bg-auth-overlay.png`, `public/assets/admin/images/crypto/bg-ico-hero.jpg` | Referenced by `assets/admin/css/app.css`; cosmetic only. |
 | `.env.example` | No record of the expected environment variables; the list below was inferred from `env()` calls in `app/` + `config/`. |
 
-## Sandbox-only override: HTTPS behind the preview proxy
+## No backend overrides — the preview is a static mock
 
-The preview proxy terminates TLS and forwards plain HTTP, and it sends neither `HTTPS`
-nor `X-Forwarded-Proto` — so `TrustProxies` cannot help and Laravel emitted `http://`
-asset and redirect URLs that the browser blocked as mixed content. `AppServiceProvider::boot()`
-therefore calls `URL::forceScheme('https')` **only** when `BASE44_PREVIEW_MODE === '1'`
-(the platform passes the flag into the container; it is also listed bare under the `app`
-service's `environment:`). With the flag unset or any other value the app keeps its
-original URL behaviour, so nothing changes in production.
+The Base44 preview serves an **isolated static mock** of the admin shell at `/`
+(`public/preview/index.html`), so the redesign is visible without a session and without
+touching the application. Consequently **no backend code is overridden**: routes,
+controllers, providers, middleware, authentication, models and database logic are exactly
+as the app ships them. `app/Providers/AppServiceProvider.php` carries no sandbox-only
+branch; the only sandbox-specific values are the `.env.base44-defaults` placeholders
+(`APP_URL` points at the public preview origin) and the compose service wiring.
 
 ## Running the sandbox environment
 
@@ -53,8 +53,9 @@ docker compose -f docker-compose.base44.yml logs -f app
 ```
 
 - `app` — PHP 8.2 CLI (`Dockerfile.base44`), repo bind-mounted at `/var/www/html`, runs
-  `composer install` at container start and serves `php artisan serve` on **host port 3000**
-  (the preview entry point).
+  `composer install` at container start and serves `server-preview.php` on **host port 3000**
+  (the preview entry point; it serves the static mock at `/` and hands every other path to
+  Laravel).
 - `mysql` — MySQL 8, database `nowstadtdash`, user `nowstadt` / `nowstadt`.
 - `redis` — Redis 7 (`REDIS_CLIENT` defaults to `phpredis`, which the image provides).
 
@@ -75,14 +76,15 @@ The public entry points render without credentials:
 for r in / /login /sign-up /forgot-password /panel/login; do
   printf '%-18s ' "$r"; curl -s -o /dev/null -w '%{http_code}\n' "http://localhost:3000$r"
 done
-# / -> 302 (redirects to /login); the rest -> 200
+# / -> 200 (the static preview mock); the rest -> 200
 ```
 
-`/` is `Route::redirect('/', 'login')`. The healthcheck probes `/login` directly rather than
-following that redirect with `-L`: with `URL::forceScheme('https')` active the redirect's
-`Location` is `https://…`, which curl cannot speak to the plain-HTTP dev server. Probing
-`/login` still only goes green when the Blade view really renders (a missing view returns
-500). Anything the login page pulls from `assets/admin/...` should answer 200 as well.
+`/` is served by the static preview mock (`public/preview/index.html`), which is what the
+healthcheck probes — it requires the shell markup (`layout-wrapper`) to be present, so a
+blank or error page fails. The application's own routes still render without credentials
+(`/login`, `/sign-up`, `/forgot-password`, `/panel/login` all answer 200; a missing Blade
+view would be a 500). Anything a panel page pulls from `assets/admin/...` should answer 200
+as well.
 
 ## State the sandbox left behind
 
@@ -122,16 +124,30 @@ following that redirect with `-L`: with `URL::forceScheme('https')` active the r
 ## Admin UI redesign + isolated preview
 
 The admin panel's look is restyled by **`public/assets/admin/css/nowstadt-theme.css`**, a
-presentation-only layer loaded after `app.css` / `app-change.css` from
-`resources/views/layouts/admin/app.blade.php`. It overrides colour, typography, surfaces,
-cards, tables, buttons, forms, the sidebar and the topbar, and it fixes two defects the
-old overrides introduced: the `.mm-active` menu item's `font-size: 200px` and the neon
-green `.text-primary` (`#00ff40`), which was unreadable on white. No markup semantics,
-routes, controllers, providers, middleware, models or database code were touched.
+presentation-only design system (tokens, then shell/sidebar/topbar/cards/tables/forms/
+buttons/badges/responsive) loaded after `app.css` / `app-change.css` from
+`resources/views/layouts/admin/app.blade.php`. It fixes two defects the old overrides
+introduced — the `.mm-active` menu item's `font-size: 200px` and the neon green
+`.text-primary` (`#00ff40`), unreadable on white — and replaces the loud gradient stat
+icons with soft tinted chips.
 
-Because the admin dashboard sits behind `auth` + `is_admin`, and the preview proxy cannot
-follow the app's `"/" -> /login` redirect chain, the preview serves an **isolated static
-mock** instead of the gated page:
+Two traps when editing it:
+
+- The stat cards carry Bootstrap's `bg-primary` **utility** on the icon chip, and that
+  rule is `!important`. Tint overrides for `.mini-stat-icon` need `!important` *and*
+  the `.card.mini-stats-wid` ancestor, or the chips stay solid blue and the coloured
+  glyphs on top become unreadable.
+- `app-change.css` also uses `!important` on `.mm-active > a` and `.navbar-brand-box`,
+  so sidebar overrides have to out-rank it.
+
+`resources/views/admin/general/dashboard.blade.php` carries the redesigned overview
+(page header + "Platform overview" / "Approvals" / "Catalog" groups); every route and
+count variable is unchanged. No markup semantics, routes, controllers, providers,
+middleware, models or database code were touched.
+
+The preview serves an **isolated static mock** at `/` so the shell is visible without a
+session and without any backend change (the mock mirrors the real Blade markup and links
+the same stylesheets, so CSS edits show up in it immediately):
 
 - `public/preview/index.html` — the admin shell (topbar, sidebar, breadcrumb, stat cards,
   list/table, form) built from the real Blade markup and the real stylesheets, with mock

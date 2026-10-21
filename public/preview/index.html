@@ -40,7 +40,7 @@
                         <img class="rounded-circle header-profile-user"
                              src="https://ui-avatars.com/api/?background=182636&color=ffffff&bold=1&name=A" alt="Admin">
                         <span class="d-none d-xl-inline-block ms-1">Admin
-                            <i class="mdi mdi-check-decagram" style="font-size:18px;vertical-align:middle;color:#2f41ff;"></i>
+                            <i class="mdi mdi-check-decagram" style="font-size:18px;vertical-align:middle;color:#2563eb;"></i>
                         </span>
                         <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                     </button>
@@ -121,23 +121,18 @@
         <div class="page-content">
             <div class="container-fluid">
 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">Dashboard</h4>
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="#">admin.dashboard</a></li>
-                                    <li class="breadcrumb-item active">Dashboard</li>
-                                </ol>
-                            </div>
-                        </div>
+                <!-- ---------- page header ---------- -->
+                <div class="nw-page-head">
+                    <div>
+                        <h1 class="nw-page-head__title">Dashboard</h1>
+                        <p class="nw-page-head__sub">Platform overview and key metrics</p>
                     </div>
                 </div>
 
-                <!-- ---------- stat cards ---------- -->
+                <!-- ---------- platform overview ---------- -->
+                <p class="nw-section-label">Platform overview</p>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-xl-3 col-md-6">
                         <div class="card mini-stats-wid">
                             <div class="card-body">
                                 <a class="kt-link" href="#">
@@ -156,18 +151,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-xl-3 col-md-6">
                         <div class="card mini-stats-wid">
                             <div class="card-body">
                                 <a class="kt-link" href="#">
                                     <div class="d-flex">
                                         <div class="flex-grow-1">
-                                            <p class="text-muted fw-medium">Businesses</p>
-                                            <h4 class="mb-0">342</h4>
+                                            <p class="text-muted fw-medium">Event Categories</p>
+                                            <h4 class="mb-0">24</h4>
                                         </div>
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-briefcase font-size-24"></i></span>
+                                                <span class="avatar-title"><i class="fa fa-tasks font-size-24"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -175,18 +170,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-xl-3 col-md-6">
                         <div class="card mini-stats-wid">
                             <div class="card-body">
                                 <a class="kt-link" href="#">
                                     <div class="d-flex">
                                         <div class="flex-grow-1">
-                                            <p class="text-muted fw-medium">Pending Businesses</p>
-                                            <h4 class="mb-0">18</h4>
+                                            <p class="text-muted fw-medium">Business Categories</p>
+                                            <h4 class="mb-0">31</h4>
                                         </div>
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-time-five font-size-24"></i></span>
+                                                <span class="avatar-title"><i class="fa fa-envelope-square font-size-24"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -194,48 +189,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card mini-stats-wid">
-                            <div class="card-body">
-                                <a class="kt-link" href="#">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1">
-                                            <p class="text-muted fw-medium">Events</p>
-                                            <h4 class="mb-0">96</h4>
-                                        </div>
-                                        <div class="flex-shrink-0 align-self-center">
-                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-calendar font-size-24"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="card mini-stats-wid">
-                            <div class="card-body">
-                                <a class="kt-link" href="#">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1">
-                                            <p class="text-muted fw-medium">Pending Events</p>
-                                            <h4 class="mb-0">7</h4>
-                                        </div>
-                                        <div class="flex-shrink-0 align-self-center">
-                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-time-five font-size-24"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-xl-3 col-md-6">
                         <div class="card mini-stats-wid">
                             <div class="card-body">
                                 <a class="kt-link" href="#">
@@ -246,7 +200,7 @@
                                         </div>
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-image font-size-24"></i></span>
+                                                <span class="avatar-title"><i class="fa fa-image font-size-24"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -254,7 +208,93 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                </div>
+
+                <!-- ---------- approvals ---------- -->
+                <p class="nw-section-label nw-section-gap">Approvals</p>
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Pending Businesses</p>
+                                            <h4 class="mb-0">18</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="fa fa-briefcase font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Approved Businesses</p>
+                                            <h4 class="mb-0">342</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="fa fa-box font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Pending Events</p>
+                                            <h4 class="mb-0">7</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="fa fa-calendar font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Approved Events</p>
+                                            <h4 class="mb-0">96</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="fa fa-tags font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---------- catalog ---------- -->
+                <p class="nw-section-label nw-section-gap">Catalog</p>
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
                         <div class="card mini-stats-wid">
                             <div class="card-body">
                                 <a class="kt-link" href="#">
@@ -265,7 +305,7 @@
                                         </div>
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-map-pin font-size-24"></i></span>
+                                                <span class="avatar-title"><i class="fa fa-map-marker font-size-24"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -273,7 +313,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-xl-3 col-md-6">
                         <div class="card mini-stats-wid">
                             <div class="card-body">
                                 <a class="kt-link" href="#">
@@ -284,7 +324,26 @@
                                         </div>
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
-                                                <span class="avatar-title"><i class="bx bx-adjust font-size-24"></i></span>
+                                                <span class="avatar-title"><i class="fa fa-adjust font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Content</p>
+                                            <h4 class="mb-0">9</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-detail font-size-24"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -294,26 +353,41 @@
                     </div>
                 </div>
 
-                <!-- ---------- list / table ---------- -->
+                <!-- ---------- list page: filters, table, status badges ---------- -->
+                <p class="nw-section-label nw-section-gap">List page pattern</p>
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">Users</h4>
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="#">admin.dashboard</a></li>
-                                    <li class="breadcrumb-item active">Users</li>
-                                </ol>
-                            </div>
-                        </div>
-
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
-                                    <h4 class="card-title mb-2">All Users</h4>
-                                    <a href="#" class="btn btn-primary btn-sm waves-effect waves-light">
-                                        <i class="bx bx-plus me-1"></i> Add New
+                                    <h4 class="card-title mb-0">All Users</h4>
+                                    <a href="#" class="btn btn-primary btn-label waves-effect waves-light">
+                                        <i class="bx bx-plus label-icon"></i> Add New
                                     </a>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" placeholder="Search users by name or email…">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-control">
+                                            <option>All types</option>
+                                            <option>Business User</option>
+                                            <option>Sub Admin</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control">
+                                            <option>All status</option>
+                                            <option>Active</option>
+                                            <option>Pending</option>
+                                            <option>Blocked</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-light w-100 waves-effect">Reset</button>
+                                    </div>
                                 </div>
 
                                 <div class="table-responsive">
@@ -327,13 +401,14 @@
                                             <th>Mobile</th>
                                             <th>Type</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
                                             <td>101</td>
-                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=A" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td><img class="rounded-circle" width="32" height="32" alt="Alex Morgan"
+                                                     src="https://ui-avatars.com/api/?background=2563eb&color=ffffff&bold=1&name=A"></td>
                                             <td>Alex Morgan</td>
                                             <td>alex@example.com</td>
                                             <td>+43 660 1234567</td>
@@ -346,12 +421,13 @@
                                         </tr>
                                         <tr>
                                             <td>102</td>
-                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=S" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td><img class="rounded-circle" width="32" height="32" alt="Sara Klein"
+                                                     src="https://ui-avatars.com/api/?background=059669&color=ffffff&bold=1&name=S"></td>
                                             <td>Sara Klein</td>
                                             <td>sara@example.com</td>
                                             <td>+43 664 7654321</td>
                                             <td>Sub Admin</td>
-                                            <td><span class="badge badge-soft-success">Active</span></td>
+                                            <td><span class="badge badge-soft-primary">Active</span></td>
                                             <td>
                                                 <a href="#" class="btn btn-sm btn-light"><i class="bx bx-pencil"></i></a>
                                                 <a href="#" class="btn btn-sm btn-light text-danger"><i class="bx bx-trash"></i></a>
@@ -359,7 +435,8 @@
                                         </tr>
                                         <tr>
                                             <td>103</td>
-                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=D" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td><img class="rounded-circle" width="32" height="32" alt="Daniel Weber"
+                                                     src="https://ui-avatars.com/api/?background=d97706&color=ffffff&bold=1&name=D"></td>
                                             <td>Daniel Weber</td>
                                             <td>daniel@example.com</td>
                                             <td>+43 699 1122334</td>
@@ -372,7 +449,8 @@
                                         </tr>
                                         <tr>
                                             <td>104</td>
-                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=M" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td><img class="rounded-circle" width="32" height="32" alt="Mia Fischer"
+                                                     src="https://ui-avatars.com/api/?background=7c3aed&color=ffffff&bold=1&name=M"></td>
                                             <td>Mia Fischer</td>
                                             <td>mia@example.com</td>
                                             <td>+43 676 9988776</td>
@@ -386,36 +464,15 @@
                                         </tbody>
                                     </table>
                                 </div>
-
-                                <div class="d-flex flex-wrap align-items-center justify-content-between mt-3">
-                                    <div class="text-muted" style="font-size:13px;">Showing 1 to 4 of 1,248 entries</div>
-                                    <ul class="pagination mb-0">
-                                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ---------- form ---------- -->
+                <!-- ---------- form pattern ---------- -->
+                <p class="nw-section-label nw-section-gap">Form pattern</p>
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">Add City</h4>
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="#">admin.dashboard</a></li>
-                                    <li class="breadcrumb-item"><a href="#">Cities</a></li>
-                                    <li class="breadcrumb-item active">Add</li>
-                                </ol>
-                            </div>
-                        </div>
-
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">City details</h4>

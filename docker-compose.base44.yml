@@ -22,6 +22,8 @@ services:
       - /run/base44/app.env # platform-supplied secrets — always wins
     environment:
       - BASE44_PREVIEW_MODE
+      # Resolved by .env.base44-defaults to build APP_URL on the public preview origin.
+      - BASE44_PUBLIC_HOST_SUFFIX
       # Sandbox only: the uploaded repo ships no composer.lock, so dependencies
       # must be resolved fresh, and Composer 2.10 refuses every Laravel 10 release
       # ("affected by security advisories"). Restoring the project's composer.lock
@@ -57,11 +59,9 @@ services:
         # every other path to Laravel (same as `php artisan serve` did).
         exec php -S 0.0.0.0:3000 -t public server-preview.php
     healthcheck:
-      # Probes the login page directly (the app's own "/" target). /login is 200 only
-      # when the Blade view renders — a missing view is a 500 and fails the probe.
-      # Deliberately no -L: with the preview override in AppServiceProvider the app's
-      # redirects carry https://, which curl would try to speak to this plain-HTTP server.
-      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:3000/login || exit 1"]
+      # Probes the isolated admin-UI preview served at "/" (the entry the Base44 preview
+      # shows) and requires the shell markup to be present, so a blank or error page fails.
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/ | grep -q 'layout-wrapper' || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
