@@ -831,3 +831,46 @@ label {
     .table > thead th,
     .table > tbody td { padding: .7rem .65rem; font-size: 13px; }
 }
+
+/* --------------------------------------------------------------------------
+   15. Inner pages (list / create / edit)
+
+   Every admin list page renders its card body as: a leading `.text-end` block
+   holding the "Add" action, then the `.card-title`, then the table. Lift that
+   action to the card's top-right so the title and its action share one line,
+   the way the overview page does — presentation only, the markup is untouched.
+   -------------------------------------------------------------------------- */
+.card-body { position: relative; }
+
+.card-body > .text-end:first-child {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    margin: 0;
+    z-index: 2;
+}
+
+.card-body > .text-end:first-child + .card-title { padding-right: 8.5rem; }
+
+/* Create/edit pages use Bootstrap's .col-form-label; keep it on the system's
+   label treatment rather than the theme default. */
+.col-form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--nw-ink-soft);
+}
+
+/* Language tabs that sit directly inside a card body */
+.card-body > .nav-tabs { margin-bottom: 1.35rem; }
+
+/* A spinner inside a button inherits the button's ink */
+.btn .spinner-border-sm { border-width: .15em; }
+
+@media (max-width: 575.98px) {
+    .card-body > .text-end:first-child {
+        position: static;
+        margin-bottom: .85rem;
+        text-align: left;
+    }
+    .card-body > .text-end:first-child + .card-title { padding-right: 0; }
+}

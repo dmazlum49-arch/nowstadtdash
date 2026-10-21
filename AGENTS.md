@@ -140,6 +140,14 @@ Two traps when editing it:
 - `app-change.css` also uses `!important` on `.mm-active > a` and `.navbar-brand-box`,
   so sidebar overrides have to out-rank it.
 
+Section 15 of the file ("Inner pages") carries the list / create / edit treatment that reaches
+every non-dashboard page **without touching their markup**. Admin list pages render a leading
+`.text-end` action block before their `.card-title` (verified in all 16 list views), so that
+block is lifted to the card's top-right (absolute, with a padding reserve on the title) and
+falls back to a stacked layout under 576px. Create/edit `.col-form-label` rows and in-card
+`.nav-tabs` are matched to the system as well. The isolated mock at `public/preview/index.html`
+mirrors that real markup (list + form patterns), so CSS edits show up there immediately.
+
 `resources/views/admin/general/dashboard.blade.php` carries the redesigned overview
 (page header + "Platform overview" / "Approvals" / "Catalog" groups); every route and
 count variable is unchanged. No markup semantics, routes, controllers, providers,
