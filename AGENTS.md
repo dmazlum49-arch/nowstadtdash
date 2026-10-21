@@ -34,15 +34,24 @@ references a path that 404s, compare it with the upload and move the folder.
 | `public/assets/admin/images/bg-auth-overlay.png`, `public/assets/admin/images/crypto/bg-ico-hero.jpg` | Referenced by `assets/admin/css/app.css`; cosmetic only. |
 | `.env.example` | No record of the expected environment variables; the list below was inferred from `env()` calls in `app/` + `config/`. |
 
-## No backend overrides — the preview is a static mock
+## One sandbox-gated override: URL generation behind the preview proxy
 
-The Base44 preview serves an **isolated static mock** of the admin shell at `/`
-(`public/preview/index.html`), so the redesign is visible without a session and without
-touching the application. Consequently **no backend code is overridden**: routes,
-controllers, providers, middleware, authentication, models and database logic are exactly
-as the app ships them. `app/Providers/AppServiceProvider.php` carries no sandbox-only
-branch; the only sandbox-specific values are the `.env.base44-defaults` placeholders
-(`APP_URL` points at the public preview origin) and the compose service wiring.
+The preview proxy terminates TLS and forwards the request to the container over plain HTTP
+with the sandbox-internal host (`<port>-<sandbox id>.e2b.app`), which the browser cannot
+reach and which the preview page's own origin does not match. Laravel builds every
+`route()` / `asset()` URL — and therefore every redirect, including the one after a login
+POST — from that host and scheme, so the browser blocked them (wrong origin / mixed
+content) and the target page never opened: the login seemed to do nothing and panel links
+appeared dead. `app/Providers/AppServiceProvider.php` therefore calls
+`URL::forceRootUrl(config('app.url'))` and `URL::forceScheme('https')` **only** when
+`BASE44_PREVIEW_MODE === '1'`; with the flag unset (or any other value) the app generates
+URLs exactly as before. `APP_URL` in `.env.base44-defaults` is the public preview origin,
+so the generated URLs stay inside the preview's own origin. This is the only backend
+override — routes, controllers, middleware, authentication, models and database logic are
+untouched.
+
+The preview still serves an **isolated static mock** of the admin shell at `/`
+(`public/preview/index.html`) — see the last section.
 
 ## Running the sandbox environment
 
@@ -168,5 +177,9 @@ the same stylesheets, so CSS edits show up in it immediately):
 
 The application itself is unchanged and still reachable at its own routes (`/login`,
 `/panel/login`, …). To browse the real admin panel, sign in at `/panel/login` with the
-dev admin seeded by `UserSeeder` (`admin@gmail.com` / `123456`; `RolePermissionSeeder`
-must also have run so the `Super Admin` role is assigned, otherwise list pages return 403).
+dev admin from `UserSeeder` — username `admin` (or `admin@gmail.com`), password `123456`.
+The sandbox database was seeded on 2026-10-21 with `UserSeeder` (two admins, both
+`type=admin`, `status=active`) and `RolePermissionSeeder` (which assigns `Super Admin` to
+the first admin; without it the permission-gated pages answer 403). Both seeders are
+idempotent enough for a fresh `mysql-data` volume; re-seed only if the accounts are gone.
+`db:seed --class=UserSeeder` inserts duplicates if run twice.
