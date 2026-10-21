@@ -25,6 +25,8 @@
     <!-- App Css-->
     <link href="{{url('assets/admin/css/app.css')}}" id="app-style" rel="stylesheet" type="text/css" />
     <link href="{{url('assets/admin/css/app-change.css')}}" id="app-style" rel="stylesheet" type="text/css" />
+    <!-- Nowstadt redesign layer (presentation only) -->
+    <link href="{{url('assets/admin/css/nowstadt-theme.css')}}" rel="stylesheet" type="text/css" />
     @yield('head_css')
 </head>
 

@@ -118,3 +118,31 @@ following that redirect with `-L`: with `URL::forceScheme('https')` active the r
   Firebase Cloud Messaging (`config/constants.php` expects the credentials JSON at
   `public/default/fcm_config.json` — that file *is* present, but it holds no real project
   credentials). `ABLY_KEY` / Pusher keys are only needed if broadcasting is enabled.
+
+## Admin UI redesign + isolated preview
+
+The admin panel's look is restyled by **`public/assets/admin/css/nowstadt-theme.css`**, a
+presentation-only layer loaded after `app.css` / `app-change.css` from
+`resources/views/layouts/admin/app.blade.php`. It overrides colour, typography, surfaces,
+cards, tables, buttons, forms, the sidebar and the topbar, and it fixes two defects the
+old overrides introduced: the `.mm-active` menu item's `font-size: 200px` and the neon
+green `.text-primary` (`#00ff40`), which was unreadable on white. No markup semantics,
+routes, controllers, providers, middleware, models or database code were touched.
+
+Because the admin dashboard sits behind `auth` + `is_admin`, and the preview proxy cannot
+follow the app's `"/" -> /login` redirect chain, the preview serves an **isolated static
+mock** instead of the gated page:
+
+- `public/preview/index.html` — the admin shell (topbar, sidebar, breadcrumb, stat cards,
+  list/table, form) built from the real Blade markup and the real stylesheets, with mock
+  data. CSS edits show up in it immediately because it links the same CSS files; only the
+  static markup would need updating to mirror a view change.
+- `server-preview.php` — a preview-only router that serves that file at `/` and passes
+  every other path to Laravel unchanged. `docker-compose.base44.yml` starts the dev server
+  with it (`php -S 0.0.0.0:3000 -t public server-preview.php`). Laravel never loads this
+  file; delete it and switch the command back to `php artisan serve` to drop the preview.
+
+The application itself is unchanged and still reachable at its own routes (`/login`,
+`/panel/login`, …). To browse the real admin panel, sign in at `/panel/login` with the
+dev admin seeded by `UserSeeder` (`admin@gmail.com` / `123456`; `RolePermissionSeeder`
+must also have run so the `Super Admin` role is assigned, otherwise list pages return 403).

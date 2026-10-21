@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Nowstadt Admin — UI preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Same stylesheets the real admin layout loads, in the same order. -->
+    <link href="/assets/admin/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="/assets/admin/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/icons.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/app.css" rel="stylesheet" />
+    <link href="/assets/admin/css/app-change.css" rel="stylesheet" />
+    <link href="/assets/admin/css/nowstadt-theme.css" rel="stylesheet" />
+</head>
+
+<body data-sidebar="dark">
+<div id="layout-wrapper">
+
+    <!-- ============================ top navigation ============================ -->
+    <header id="page-topbar">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <div class="navbar-brand-box">
+                    <a href="#" class="logo">
+                        <span class="logo-sm"><i class="bx bxs-building-house font-size-20"></i></span>
+                        <span class="logo-lg"><i class="bx bxs-building-house font-size-20 me-2"></i>Nowstadt</span>
+                    </a>
+                </div>
+                <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="d-flex">
+                <div class="dropdown d-inline-block">
+                    <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img class="rounded-circle header-profile-user"
+                             src="https://ui-avatars.com/api/?background=182636&color=ffffff&bold=1&name=A" alt="Admin">
+                        <span class="d-none d-xl-inline-block ms-1">Admin
+                            <i class="mdi mdi-check-decagram" style="font-size:18px;vertical-align:middle;color:#2f41ff;"></i>
+                        </span>
+                        <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#"><i class="bx bx-user font-size-16 align-middle me-1"></i> Profile</a>
+                        <a class="dropdown-item" href="#"><i class="bx bx-hide font-size-16 align-middle me-1"></i> Change Password</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================================ sidebar =============================== -->
+    <div class="vertical-menu">
+        <div data-simplebar class="h-100">
+            <div id="sidebar-menu">
+                <ul class="metismenu list-unstyled" id="side-menu">
+                    <li class="menu-title">Menu</li>
+
+                    <li class="mm-active">
+                        <a href="#" class="waves-effect"><i class="bx bx-home-circle"></i><span>Dashboard</span></a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="waves-effect has-arrow"><i class="bx bx-user"></i><span>User Management</span></a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="#">Business Users</a></li>
+                            <li><a href="#">Sub Admins</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="waves-effect has-arrow"><i class="bx bx-briefcase"></i><span>Business Management</span></a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="#">Pending</a></li>
+                            <li><a href="#">Approved</a></li>
+                            <li><a href="#">Business Categories</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#" class="waves-effect has-arrow"><i class="bx bx-calendar-event"></i><span>Event Management</span></a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="#">Pending</a></li>
+                            <li><a href="#">Approved</a></li>
+                            <li><a href="#">Event Categories</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="menu-title">Content</li>
+
+                    <li><a href="#" class="waves-effect"><i class="bx bx-image"></i><span>Banners</span></a></li>
+                    <li><a href="#" class="waves-effect"><i class="bx bx-map-pin"></i><span>Cities</span></a></li>
+                    <li><a href="#" class="waves-effect"><i class="bx bx-adjust"></i><span>Services</span></a></li>
+                    <li><a href="#" class="waves-effect"><i class="bx bx-detail"></i><span>Contents</span></a></li>
+
+                    <li class="menu-title">System</li>
+
+                    <li>
+                        <a href="#" class="waves-effect has-arrow"><i class="bx bx-shield-quarter"></i><span>Moderation</span></a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="#">Reports</a></li>
+                            <li><a href="#">Comments</a></li>
+                            <li><a href="#">Messages</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" class="waves-effect"><i class="bx bx-lock-alt"></i><span>Roles &amp; Permissions</span></a></li>
+                    <li><a href="#" class="waves-effect"><i class="bx bx-cog"></i><span>Site Settings</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================== content ================================ -->
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Dashboard</h4>
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="#">admin.dashboard</a></li>
+                                    <li class="breadcrumb-item active">Dashboard</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---------- stat cards ---------- -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Users</p>
+                                            <h4 class="mb-0">1,248</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-user-circle font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Businesses</p>
+                                            <h4 class="mb-0">342</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-briefcase font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Pending Businesses</p>
+                                            <h4 class="mb-0">18</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-time-five font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Events</p>
+                                            <h4 class="mb-0">96</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-calendar font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Pending Events</p>
+                                            <h4 class="mb-0">7</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-time-five font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Banners</p>
+                                            <h4 class="mb-0">12</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-image font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Cities</p>
+                                            <h4 class="mb-0">54</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-map-pin font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mini-stats-wid">
+                            <div class="card-body">
+                                <a class="kt-link" href="#">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Services</p>
+                                            <h4 class="mb-0">38</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title"><i class="bx bx-adjust font-size-24"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---------- list / table ---------- -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Users</h4>
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="#">admin.dashboard</a></li>
+                                    <li class="breadcrumb-item active">Users</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+                                    <h4 class="card-title mb-2">All Users</h4>
+                                    <a href="#" class="btn btn-primary btn-sm waves-effect waves-light">
+                                        <i class="bx bx-plus me-1"></i> Add New
+                                    </a>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered dt-responsive nowrap w-100">
+                                        <thead>
+                                        <tr>
+                                            <th>#ID</th>
+                                            <th>Profile</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Mobile</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>101</td>
+                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=A" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td>Alex Morgan</td>
+                                            <td>alex@example.com</td>
+                                            <td>+43 660 1234567</td>
+                                            <td>Business User</td>
+                                            <td><span class="badge badge-soft-success">Active</span></td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-light"><i class="bx bx-pencil"></i></a>
+                                                <a href="#" class="btn btn-sm btn-light text-danger"><i class="bx bx-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>102</td>
+                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=S" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td>Sara Klein</td>
+                                            <td>sara@example.com</td>
+                                            <td>+43 664 7654321</td>
+                                            <td>Sub Admin</td>
+                                            <td><span class="badge badge-soft-success">Active</span></td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-light"><i class="bx bx-pencil"></i></a>
+                                                <a href="#" class="btn btn-sm btn-light text-danger"><i class="bx bx-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>103</td>
+                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=D" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td>Daniel Weber</td>
+                                            <td>daniel@example.com</td>
+                                            <td>+43 699 1122334</td>
+                                            <td>Business User</td>
+                                            <td><span class="badge badge-soft-warning">Pending</span></td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-light"><i class="bx bx-pencil"></i></a>
+                                                <a href="#" class="btn btn-sm btn-light text-danger"><i class="bx bx-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>104</td>
+                                            <td><img src="https://ui-avatars.com/api/?background=eef0f6&color=111827&name=M" class="rounded-circle" width="36" height="36" alt=""></td>
+                                            <td>Mia Fischer</td>
+                                            <td>mia@example.com</td>
+                                            <td>+43 676 9988776</td>
+                                            <td>Business User</td>
+                                            <td><span class="badge badge-soft-danger">Blocked</span></td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-light"><i class="bx bx-pencil"></i></a>
+                                                <a href="#" class="btn btn-sm btn-light text-danger"><i class="bx bx-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="d-flex flex-wrap align-items-center justify-content-between mt-3">
+                                    <div class="text-muted" style="font-size:13px;">Showing 1 to 4 of 1,248 entries</div>
+                                    <ul class="pagination mb-0">
+                                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---------- form ---------- -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Add City</h4>
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="#">admin.dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="#">Cities</a></li>
+                                    <li class="breadcrumb-item active">Add</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">City details</h4>
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">City name</label>
+                                                <input type="text" class="form-control" placeholder="Enter city name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Country</label>
+                                                <select class="form-control">
+                                                    <option>Austria</option>
+                                                    <option>Germany</option>
+                                                    <option>Switzerland</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Status</label>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" checked>
+                                                    <label class="form-check-label">Active</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Upload image</label>
+                                                <input type="file" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-primary waves-effect waves-light">Save</button>
+                                        <button type="button" class="btn btn-light waves-effect">Cancel</button>
+                                        <button type="button" class="btn btn-danger waves-effect">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">2026 © Nowstadt.</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="/assets/admin/libs/jquery/jquery.min.js"></script>
+<script src="/assets/admin/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/admin/libs/metismenu/metisMenu.min.js"></script>
+<script>
+    // Preview-only: initialise the menu and the sidebar collapse so the shell behaves
+    // like the real admin panel.
+    jQuery(function () {
+        jQuery('#side-menu').metisMenu();
+
+        jQuery('#vertical-menu-btn').on('click', function (e) {
+            e.preventDefault();
+            jQuery('body').toggleClass('vertical-collpsed');
+            jQuery('body').toggleClass('sidebar-enable');
+        });
+    });
+</script>
+</body>
+</html>

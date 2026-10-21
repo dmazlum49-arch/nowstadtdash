@@ -35,6 +35,10 @@ services:
       - DB_PASSWORD=nowstadt
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      # PHP's built-in dev server is single-threaded: it handles one request at a
+      # time, so the browser's parallel requests (the page plus its assets) queue
+      # behind each other. Several workers remove that serialisation.
+      - PHP_CLI_SERVER_WORKERS=6
     depends_on:
       mysql:
         condition: service_healthy
@@ -49,7 +53,9 @@ services:
                  storage/framework/views storage/app/public storage/logs \
                  bootstrap/cache
         composer install --no-interaction --prefer-dist --no-progress
-        exec php artisan serve --host=0.0.0.0 --port=3000
+        # server-preview.php serves the isolated admin-UI preview at "/" and hands
+        # every other path to Laravel (same as `php artisan serve` did).
+        exec php -S 0.0.0.0:3000 -t public server-preview.php
     healthcheck:
       # Probes the login page directly (the app's own "/" target). /login is 200 only
       # when the Blade view renders — a missing view is a 500 and fails the probe.
