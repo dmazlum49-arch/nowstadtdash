@@ -51,9 +51,11 @@ services:
         composer install --no-interaction --prefer-dist --no-progress
         exec php artisan serve --host=0.0.0.0 --port=3000
     healthcheck:
-      # -L follows the app's own "/" -> /login redirect, so the probe only passes
-      # when the login page actually renders (not merely when the router answers).
-      test: ["CMD-SHELL", "curl -fsSL -o /dev/null http://127.0.0.1:3000/ || exit 1"]
+      # Probes the login page directly (the app's own "/" target). /login is 200 only
+      # when the Blade view renders — a missing view is a 500 and fails the probe.
+      # Deliberately no -L: with the preview override in AppServiceProvider the app's
+      # redirects carry https://, which curl would try to speak to this plain-HTTP server.
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:3000/login || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10

@@ -2,36 +2,47 @@
 
 Laravel 10 app (PHP 8.2). This file records only what is not obvious from the manifests.
 
-## Application code: imported from `main`, but `resources/` is still missing
+## The repo arrived as a flat upload — the nesting was reconstructed
 
-The repository originally arrived as a flat, structure-less upload. On 2026-10-21 the
-application code was pulled from the GitHub repo `dmazlum49-arch/nowstadtdash` (branch
-`main`, while it was public) and re-assembled into the standard Laravel layout:
+The repository was uploaded flat twice: first the application code, then (2026-10-21)
+`resources/` and `public/`'s assets, each time with the directory nesting stripped.
+Both times the files were re-assembled into the standard Laravel layout:
 
 | Now in the repo | Came from (flat upload) |
 | --- | --- |
 | `app/{Console,Exceptions,Helpers,Http,Mail,Models,Providers,Services}` | the same names at the repository root |
 | `database/migrations/` (114 files) | the `YYYY_MM_DD_NNNNNN_*.php` files at the root |
 | `database/{factories,seeders}` | `factories/`, `seeders/` at the root |
-| `public/{css,js,fonts,images,default,jquery,jquery-validation,datatables.net*,metismenu,node-waves,simplebar,sweetalert2,toastr,fancybox}` | same names at the root (`default/fcm_config.json` confirms these belong to `public/`) |
-| `public/{index.php,favicon.ico,robots.txt}` | same files at the root |
-| `public/tinymce/{tinymce.min.js,jquery.tinymce.min.js,skins,themes,icons,plugins/*}` | `tinymce.min.js`, `jquery.tinymce.min.js`, `skins/`, `themes/`, `icons/` and the TinyMCE plugin folders (`plugin.min.js` marker) at the root |
+| `resources/views/{admin,user,layouts,emails}` + `resources/views/welcome.blade.php` | the same names at the repository root |
+| `resources/lang/{de,en}` | `lang/` at the root |
+| `resources/{css,js}` | `css/`, `js/` at the root (Vite entry points) |
+| `public/assets/admin/{css,js,images,fonts}` | `public/{css,js,images,fonts}` |
+| `public/assets/admin/libs/{jquery,jquery-validation,metismenu,simplebar,node-waves,toastr,sweetalert2,fancybox,tinymce,datatables.net*}` | the same names directly under `public/` |
+| `public/{index.php,favicon.ico,robots.txt,default/}` | same files at the root |
 
-Because the upload was flattened, the `public/` asset paths above are a best-effort
-reconstruction (TinyMCE is assumed at `public/tinymce/`). If a view references an asset
-path that 404s, compare it with how the file was uploaded and move the folder — the
-inventory is complete, only the nesting is a guess.
+The nesting is a reconstruction, not a copy of the original tree: the layouts and CSS
+reference everything as `assets/admin/...` (`url('assets/admin/css/app.css')`,
+`../fonts/boxicons.woff2`, `../images/...`), which is what drove the mapping. If a view
+references a path that 404s, compare it with the upload and move the folder.
 
-**Still missing from `main` (verified: 0 `*.blade.php` files in the whole repository):**
+**Files the upload never included** (verified absent — nothing else in the app is missing):
 
-| Missing | Effect |
+| Missing file | Effect |
 | --- | --- |
-| `resources/` — all Blade views (`resources/views/…`, e.g. `user.guest.login`), plus `resources/css/app.css` and `resources/js/app.js` that `vite.config.js` declares as entry points | Every page returns HTTP 500 `View [user.guest.login] not found`. The app boots, routes and hits the database correctly — only rendering fails. |
+| `public/assets/admin/libs/bootstrap/js/bootstrap.bundle.min.js` | Bootstrap's JS never loads (the CSS does). Dropdowns/collapse/modals in the admin and user panels will not open. |
+| `public/default/no_image.png` | `checkFileExist()` falls back to this placeholder, so every missing image (e.g. the login logo) renders as a broken image. |
+| `public/assets/admin/images/bg-auth-overlay.png`, `public/assets/admin/images/crypto/bg-ico-hero.jpg` | Referenced by `assets/admin/css/app.css`; cosmetic only. |
 | `.env.example` | No record of the expected environment variables; the list below was inferred from `env()` calls in `app/` + `config/`. |
 
-The `app` service is therefore reported **unhealthy**: the healthcheck probes `/` for real
-(which is a 500 until the views exist) instead of a placeholder. It goes green on its own
-once `resources/views` is in place.
+## Sandbox-only override: HTTPS behind the preview proxy
+
+The preview proxy terminates TLS and forwards plain HTTP, and it sends neither `HTTPS`
+nor `X-Forwarded-Proto` — so `TrustProxies` cannot help and Laravel emitted `http://`
+asset and redirect URLs that the browser blocked as mixed content. `AppServiceProvider::boot()`
+therefore calls `URL::forceScheme('https')` **only** when `BASE44_PREVIEW_MODE === '1'`
+(the platform passes the flag into the container; it is also listed bare under the `app`
+service's `environment:`). With the flag unset or any other value the app keeps its
+original URL behaviour, so nothing changes in production.
 
 ## Running the sandbox environment
 
@@ -56,13 +67,22 @@ and `/run/base44/app.env` (Base44 dashboard secrets) last, so dashboard values a
 Local infrastructure credentials are inline in the compose `environment:` block on purpose
 — nothing there can shadow a dashboard value.
 
-Useful checks:
+### Verifying the app actually works
+
+The public entry points render without credentials:
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/phpinfo   # 200 = framework serves
-curl -s http://localhost:3000/ | head -5                                 # 500 until views exist
-docker compose -f docker-compose.base44.yml exec -T app php artisan route:list | head
+for r in / /login /sign-up /forgot-password /panel/login; do
+  printf '%-18s ' "$r"; curl -s -o /dev/null -w '%{http_code}\n' "http://localhost:3000$r"
+done
+# / -> 302 (redirects to /login); the rest -> 200
 ```
+
+`/` is `Route::redirect('/', 'login')`. The healthcheck probes `/login` directly rather than
+following that redirect with `-L`: with `URL::forceScheme('https')` active the redirect's
+`Location` is `https://…`, which curl cannot speak to the plain-HTTP dev server. Probing
+`/login` still only goes green when the Blade view really renders (a missing view returns
+500). Anything the login page pulls from `assets/admin/...` should answer 200 as well.
 
 ## State the sandbox left behind
 
@@ -84,9 +104,10 @@ docker compose -f docker-compose.base44.yml exec -T app php artisan route:list |
   defaults to `sync`; the Ratchet socket server (`Console/Commands/RunSocket.php`) and the
   scheduled commands (`events:send-reminders`, `business:weekly-summary`) need their own
   compose services to actually run.
-- The Vite asset pipeline is not wired into compose yet. In the sandbox the browser reaches
-  the app through the port-3000 origin, so once `resources/` exists either `npm run build`
-  or a Vite dev server exposed through that origin is needed.
+- The Vite pipeline is not wired into compose yet. The panel layouts load their CSS/JS from
+  `public/assets/admin/...` directly, so the pages render without it; only the `resources/css`
+  and `resources/js` entry points declared in `vite.config.js` would need a Vite dev server
+  or `npm run build`.
 - External services the code expects (real credentials belong in the Base44 dashboard
   secrets, never in the repo — the names were inferred from `env()` usage):
   AWS S3 (`config/constants.php` hardcodes `'upload_type' => 's3'`, so uploads need
