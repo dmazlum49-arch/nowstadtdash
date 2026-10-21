@@ -221,3 +221,35 @@ The sandbox database was seeded on 2026-10-21 with `UserSeeder` (two admins, bot
 the first admin; without it the permission-gated pages answer 403). Both seeders are
 idempotent enough for a fresh `mysql-data` volume; re-seed only if the accounts are gone.
 `db:seed --class=UserSeeder` inserts duplicates if run twice.
+
+## Form controls & micro-interactions layer
+
+The small controls the create/edit forms are built from are styled by
+**`public/assets/admin/css/nowstadt-forms.css`**, loaded right after `nowstadt-theme.css` in
+`resources/views/layouts/admin/app.blade.php`. It is the last stylesheet the layout links, so
+only the views' own `@section('head_css')` `<style>` blocks come later; where those collide
+(the post create view re-styles `.form-group label` and `.text-danger`), the selectors here
+carry a `body` prefix so the design system still wins.
+
+It covers: field shells (44px control height, softer border, hover + focus ring), labels,
+required markers, helper text, validation states, field rhythm and card padding, the language
+segmented control, breadcrumbs, primary actions with icon support, and the mobile form layout.
+It adds no markup and changes no field name, validation rule, route or submit behaviour.
+
+The only scripted part is **`public/assets/admin/js/nowstadt-forms.js`**, loaded after
+`app.js`. It is a progressive enhancement: each `input[type="file"]` keeps its place in the
+form (visually hidden but focusable and still submitted) and gets a drag-and-drop card beside
+it — dropzone, preview thumbnail, file name and size, replace and remove. Dropping or picking
+writes the files back onto that same input and fires the native `change` event, so the page's
+own handlers keep working; `Remove` clears `input.value` the same way.
+
+Two traps:
+
+- Inputs the views drive themselves — `.profile_image`, whose `change` event opens the
+  cropper modal in every create/edit view — are **skipped** by the script on purpose. Only
+  their box is restyled (dashed dropzone in CSS). Enhancing them would leave the cropper's
+  `image_base64` / `.show-image` thumbnail stale after a card-side remove.
+- The post form builds extra upload rows at runtime (`#add-input`). A `MutationObserver`
+  enhances those too, and the script marks each row `.nw-upload-row` so the stylesheet can
+  lay the card out next to the page's own "X" remove-row button (otherwise the button
+  stretches to the card's full height).

@@ -1,0 +1,608 @@
+/* ==========================================================================
+   Nowstadt Admin — form controls & micro-interactions
+   --------------------------------------------------------------------------
+   Companion to nowstadt-theme.css, loaded directly after it. It modernises the
+   small controls the create/edit forms are built from: text inputs, textareas,
+   selects, labels, required markers, helper text, validation states, file
+   upload cards, the language segmented control, breadcrumbs and primary
+   actions — plus the mobile form layout.
+
+   Presentation only. It adds no markup, changes no field name, validation rule,
+   route or submit behaviour. The only scripted part is the progressive
+   enhancement in assets/admin/js/nowstadt-forms.js, which decorates the
+   existing <input type="file"> elements without touching their value contract.
+
+   Contents
+     1.  Field shell — inputs, textareas, selects
+     2.  Labels & required markers
+     3.  Helper text & validation states
+     4.  Field rhythm & card padding
+     5.  Language segmented control
+     6.  Breadcrumbs
+     7.  Primary actions
+     8.  File upload cards
+     9.  Mobile form layout
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Field shell — one consistent height, softer border, quiet focus ring
+   -------------------------------------------------------------------------- */
+.form-control,
+.form-select,
+select.form-control,
+textarea.form-control,
+input[type="text"].form-control,
+input[type="email"].form-control,
+input[type="password"].form-control,
+input[type="number"].form-control,
+input[type="date"].form-control,
+input[type="time"].form-control,
+input[type="datetime-local"].form-control,
+input[type="month"].form-control {
+    min-height: 44px;
+    padding: .62rem .9rem;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--nw-ink);
+    background-color: #fff;
+    border: 1px solid var(--nw-field-line);
+    border-radius: var(--nw-radius-sm);
+    box-shadow: inset 0 1px 1px rgba(15, 23, 42, .015);
+    transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+textarea.form-control {
+    min-height: 132px;
+    padding: .8rem .95rem;
+    resize: vertical;
+}
+
+.form-select {
+    padding-right: 2.35rem;
+    background-position: right .85rem center;
+    background-size: 13px 10px;
+}
+
+/* a calm hover so the field reads as interactive before it is focused */
+.form-control:hover:not(:disabled):not([readonly]):not(:focus),
+.form-select:hover:not(:disabled):not(:focus) {
+    border-color: #cfd7e6;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: var(--nw-blue);
+    box-shadow: var(--nw-ring);
+    background-color: #fff;
+    outline: 0;
+}
+
+.form-control::placeholder,
+textarea.form-control::placeholder { color: var(--nw-faint); }
+
+.form-control:disabled,
+.form-select:disabled {
+    background-color: var(--nw-surface-alt);
+    color: var(--nw-muted);
+    cursor: not-allowed;
+}
+
+/* the native file control that the enhancement script takes over is kept in
+   the form (visually hidden, still focusable) so it submits exactly as before */
+input[type="file"].nw-file-native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2. Labels & required markers
+   -------------------------------------------------------------------------- */
+.form-label,
+body .form-group label,
+.col-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: .005em;
+    color: var(--nw-ink-soft);
+    margin-bottom: .45rem;
+    line-height: 1.45;
+}
+
+/* labels sit above their field, also inside the row layout the views use */
+.form-group.row.align-items-center { align-items: flex-start !important; }
+.form-group.row > .col-form-label { padding-top: .1rem; }
+
+/* the required marker: the views ship an empty <span class="text-danger"> on
+   optional fields and a "*" on required ones — hide the empty, tidy the star */
+body .form-group label .text-danger:empty,
+.col-form-label .text-danger:empty { display: none; }
+
+body .form-group label .text-danger,
+.col-form-label .text-danger {
+    color: var(--nw-danger);
+    font-weight: 700;
+    margin-right: .18rem;
+    line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   3. Helper text & validation states
+   -------------------------------------------------------------------------- */
+.form-text {
+    margin-top: .38rem;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--nw-muted);
+}
+
+.invalid-feedback,
+small.text-danger,
+.text-danger.small {
+    display: block;
+    margin-top: .38rem;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--nw-danger);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid,
+textarea.form-control.is-invalid {
+    border-color: #f2a2a2;
+    background-color: #fffbfb;
+    background-image: none;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+    border-color: var(--nw-danger);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, .12);
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #86d3a5;
+    background-image: none;
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+    border-color: var(--nw-success);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, .12);
+}
+
+/* --------------------------------------------------------------------------
+   4. Field rhythm & card padding
+   -------------------------------------------------------------------------- */
+.form-group { margin-bottom: 1.15rem; }
+
+.form-group:last-child { margin-bottom: 0; }
+
+.form-group.row { margin-bottom: 1.15rem; }
+
+/* the column that holds the field keeps a comfortable gutter on small screens */
+.form-group.row > [class*="col-"] { margin-bottom: 0; }
+
+.card-body { padding: 1.6rem 1.7rem; }
+
+.card > .card-body > form > .form-group:first-child,
+.card > .card-body > form > .row:first-child > .form-group:first-child { margin-top: .15rem; }
+
+/* an in-card section heading between field groups */
+.card-body .form-section-title,
+.card-body h5.form-section-title {
+    margin: 0 0 1rem;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--nw-ink);
+}
+
+/* --------------------------------------------------------------------------
+   5. Language segmented control
+   -------------------------------------------------------------------------- */
+#languageTabs.nav-tabs {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    gap: .2rem;
+    margin: 0 auto 1.35rem;
+    padding: .28rem;
+    border: 1px solid var(--nw-line);
+    border-radius: 999px;
+    background: var(--nw-surface-alt);
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, .045);
+}
+
+#languageTabs .nav-item { margin: 0; }
+
+#languageTabs .nav-link {
+    border: 0;
+    border-radius: 999px;
+    padding: .5rem 1.2rem;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .01em;
+    color: var(--nw-body);
+    background: transparent;
+    transition: color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+#languageTabs .nav-link:hover {
+    color: var(--nw-ink);
+    background: rgba(15, 23, 42, .045);
+}
+
+#languageTabs .nav-link.active {
+    color: var(--nw-blue-700);
+    background: #fff;
+    border: 0;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .08), 0 3px 10px -4px rgba(15, 23, 42, .22);
+}
+
+#languageTabs .nav-link:focus { box-shadow: var(--nw-ring); outline: 0; }
+
+/* --------------------------------------------------------------------------
+   6. Breadcrumbs — subtle, compact
+   -------------------------------------------------------------------------- */
+.page-title-box .breadcrumb {
+    --bs-breadcrumb-divider: "›";
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .005em;
+}
+
+.page-title-box .breadcrumb-item { display: inline-flex; align-items: center; }
+
+.page-title-box .breadcrumb-item + .breadcrumb-item::before {
+    padding: 0 .42rem;
+    color: var(--nw-faint);
+    font-size: 12.5px;
+}
+
+.page-title-box .breadcrumb-item a {
+    color: var(--nw-muted);
+    text-decoration: none;
+    transition: color .16s ease;
+}
+
+.page-title-box .breadcrumb-item a:hover { color: var(--nw-blue); }
+
+.page-title-box .breadcrumb-item:last-child,
+.page-title-box .breadcrumb-item:last-child a { color: var(--nw-ink-soft); }
+
+/* --------------------------------------------------------------------------
+   7. Primary actions
+   -------------------------------------------------------------------------- */
+.btn { padding: .58rem 1.15rem; }
+
+/* icon support: an icon inside a button is spaced from its label, and a
+   button that holds only an icon keeps its square proportions */
+.btn > i,
+.btn > .bx,
+.btn > .mdi,
+.btn > svg { margin-right: .42rem; line-height: 1; }
+.btn > i:last-child,
+.btn > svg:last-child { margin-right: 0; margin-left: .42rem; }
+.btn > i:only-child,
+.btn > svg:only-child { margin: 0; }
+
+.btn-primary {
+    background: var(--nw-blue);
+    border: 1px solid var(--nw-blue);
+    box-shadow: 0 1px 2px rgba(37, 99, 235, .3), 0 1px 3px rgba(37, 99, 235, .16);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: var(--nw-blue-600);
+    border-color: var(--nw-blue-600);
+}
+
+.btn-primary:focus-visible { box-shadow: var(--nw-ring); }
+
+/* the create/edit submit button — the one primary action on the page */
+#submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    min-width: 148px;
+    padding: .72rem 1.7rem;
+    font-size: 14px;
+    border-radius: var(--nw-radius-sm);
+}
+
+#submit-btn .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    border-width: .16em;
+}
+
+/* --------------------------------------------------------------------------
+   8. File upload cards
+   -------------------------------------------------------------------------- */
+.nw-upload {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* empty state — the dropzone */
+.nw-upload__drop {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    width: 100%;
+    padding: .95rem 1.05rem;
+    border: 1.5px dashed var(--nw-field-line);
+    border-radius: var(--nw-radius);
+    background: var(--nw-surface-alt);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+.nw-upload__drop:hover {
+    border-color: var(--nw-blue-100);
+    background: var(--nw-blue-50);
+}
+
+.nw-upload__drop:focus-visible {
+    outline: 0;
+    border-color: var(--nw-blue);
+    box-shadow: var(--nw-ring);
+}
+
+.nw-upload.is-dragover .nw-upload__drop {
+    border-color: var(--nw-blue);
+    border-style: solid;
+    background: var(--nw-blue-50);
+    box-shadow: var(--nw-ring);
+}
+
+.nw-upload__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--nw-line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--nw-blue);
+    font-size: 19px;
+    transition: border-color .18s ease, color .18s ease;
+}
+
+.nw-upload.is-dragover .nw-upload__icon {
+    border-color: var(--nw-blue-100);
+    background: #fff;
+}
+
+.nw-upload__copy { min-width: 0; }
+
+.nw-upload__title {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--nw-ink);
+    line-height: 1.35;
+}
+
+.nw-upload__hint {
+    display: block;
+    margin-top: .1rem;
+    font-size: 11.5px;
+    color: var(--nw-muted);
+    line-height: 1.4;
+}
+
+/* filled state — thumbnail, name, size, actions */
+.nw-upload__file {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    width: 100%;
+    padding: .65rem .75rem;
+    border: 1px solid var(--nw-line);
+    border-radius: var(--nw-radius);
+    background: #fff;
+    box-shadow: var(--nw-shadow-xs);
+}
+
+.nw-upload__thumb {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 46px;
+    height: 46px;
+    overflow: hidden;
+    border: 1px solid var(--nw-line);
+    border-radius: 11px;
+    background: var(--nw-surface-alt);
+    color: var(--nw-muted);
+    font-size: 20px;
+}
+
+.nw-upload__thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.nw-upload__meta {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.nw-upload__name {
+    display: block;
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--nw-ink);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nw-upload__size {
+    display: block;
+    margin-top: .05rem;
+    font-size: 11.5px;
+    color: var(--nw-muted);
+}
+
+.nw-upload__actions {
+    display: flex;
+    flex: none;
+    gap: .4rem;
+}
+
+.nw-upload__btn {
+    padding: .34rem .72rem;
+    border: 1px solid var(--nw-line);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--nw-ink-soft);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+}
+
+.nw-upload__btn:hover {
+    border-color: var(--nw-field-line);
+    background: var(--nw-surface-alt);
+    color: var(--nw-ink);
+}
+
+.nw-upload__btn--danger:hover {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: var(--nw-danger);
+}
+
+.nw-upload__btn:focus-visible { outline: 0; box-shadow: var(--nw-ring); }
+
+/* the row wrapper the post form renders around each upload input, together
+   with the page's own remove-row button ("X") */
+.nw-upload-row { align-items: flex-start !important; }
+
+.nw-upload-row > .remove-input {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--nw-line);
+    border-radius: var(--nw-radius-sm);
+    background: #fff;
+    color: var(--nw-muted);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+    box-shadow: none;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+}
+
+.nw-upload-row > .remove-input:hover {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: var(--nw-danger);
+}
+
+/* the cropper-managed .profile_image keeps the native control (its own modal
+   reads the change event) — only its box is modernised here */
+input[type="file"].form-control.profile_image {
+    min-height: 46px;
+    padding: .32rem .55rem;
+    border: 1.5px dashed var(--nw-field-line);
+    border-radius: var(--nw-radius);
+    background: var(--nw-surface-alt);
+    color: var(--nw-muted);
+    cursor: pointer;
+    transition: border-color .18s ease, background-color .18s ease;
+}
+
+input[type="file"].form-control.profile_image:hover {
+    border-color: var(--nw-blue-100);
+    background: var(--nw-blue-50);
+}
+
+input[type="file"].form-control.profile_image::file-selector-button {
+    margin-right: .7rem;
+    padding: .42rem .85rem;
+    border: 1px solid var(--nw-line);
+    border-radius: var(--nw-radius-xs);
+    background: #fff;
+    color: var(--nw-ink-soft);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+input[type="file"].form-control.profile_image:hover::file-selector-button {
+    border-color: var(--nw-blue-100);
+    color: var(--nw-blue-700);
+}
+
+/* the thumbnail the cropper writes after a crop */
+body .img_75,
+body .show-image {
+    border: 1px solid var(--nw-line);
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: var(--nw-shadow-xs);
+}
+
+/* --------------------------------------------------------------------------
+   9. Mobile form layout
+   -------------------------------------------------------------------------- */
+@media (max-width: 991.98px) {
+    .form-group.row > .col-form-label { margin-bottom: .4rem; }
+}
+
+@media (max-width: 767.98px) {
+    .card-body { padding: 1.25rem 1.15rem; }
+    .form-group,
+    .form-group.row { margin-bottom: 1.05rem; }
+    .form-label,
+    .form-group label,
+    .col-form-label { font-size: 12.5px; }
+
+    #languageTabs.nav-tabs {
+        width: 100%;
+        margin-bottom: 1.15rem;
+    }
+
+    #languageTabs .nav-item { flex: 1 1 0; }
+    #languageTabs .nav-link { width: 100%; text-align: center; padding: .5rem .6rem; }
+
+    /* uploads stack: the dropzone keeps its own row, the actions wrap below */
+    .nw-upload__drop { padding: .9rem; }
+    .nw-upload__file { flex-wrap: wrap; }
+    .nw-upload__meta { flex: 1 1 auto; }
+    .nw-upload__actions { width: 100%; }
+    .nw-upload__btn { flex: 1 1 0; text-align: center; }
+}
+
+@media (max-width: 575.98px) {
+    .form-control,
+    .form-select,
+    select.form-control { min-height: 46px; }
+
+    #submit-btn { width: 100%; }
+}

@@ -27,6 +27,8 @@
     <link href="{{url('assets/admin/css/app-change.css')}}" id="app-style" rel="stylesheet" type="text/css" />
     <!-- Nowstadt redesign layer (presentation only) -->
     <link href="{{url('assets/admin/css/nowstadt-theme.css')}}" rel="stylesheet" type="text/css" />
+    <!-- Nowstadt form controls & micro-interactions (presentation only) -->
+    <link href="{{url('assets/admin/css/nowstadt-forms.css')}}" rel="stylesheet" type="text/css" />
     @yield('head_css')
 </head>
 
@@ -64,6 +66,8 @@
 
     <!-- App js -->
     <script src="{{url('assets/admin/js/app.js')}}"></script>
+    <!-- Nowstadt form controls (progressive enhancement, no form logic changed) -->
+    <script src="{{url('assets/admin/js/nowstadt-forms.js')}}"></script>
     @yield('page_script')
     <script>
         @if(session()->has('message'))
