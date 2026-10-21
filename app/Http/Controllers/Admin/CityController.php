@@ -108,16 +108,13 @@ class CityController extends Controller
         }
 
         foreach ($input as $lang => $name) {
-            // Only insert if language text is provided
-            if (!empty($name)) {
-                City::create([
-                    'city_name' => $name,
-                    'latitude'  => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'language'  => $lang,
-                    'unique_id' => $uniqueId,
-                ]);
-            }
+            City::create([
+                'city_name' => $name ?? '',
+                'latitude'  => $request->latitude,
+                'longitude' => $request->longitude,
+                'language'  => $lang,
+                'unique_id' => $uniqueId,
+            ]);
         }
 
         flash_session('success', __('City created successfully'));
@@ -144,7 +141,7 @@ class CityController extends Controller
         // dd($request->all());
         $request->validate([
             'city_name' => 'required|array',
-            'city_name.*' => 'required|string|max:255',
+            'city_name.*' => 'nullable|string|max:255',
             'latitude'      => 'nullable|numeric',
             'longitude'     => 'nullable|numeric',
         ]);
@@ -157,13 +154,13 @@ class CityController extends Controller
                 ->first();
 
             if ($category) {
-                $category->city_name = $name;
+                $category->city_name = $name ?? '';
                 $category->latitude = $request->latitude;
                 $category->longitude = $request->longitude;
                 $category->save();
             } else {
                 City::create([
-                    'city_name' => $name,
+                    'city_name' => $name ?? '',
                     'latitude'  => $request->latitude,
                     'longitude' => $request->longitude,
                     'language' => $lang,

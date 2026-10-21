@@ -93,7 +93,7 @@
                                             <!-- Title -->
                                             <div class="mb-4 row">
                                                 <label for="title_{{ $code }}" class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>Title ({{ $language }})
+                                                    Title ({{ $language }})
                                                 </label>
                                                 <div class="col-sm-9">
                                                     <input type="text" class="form-control"
@@ -106,7 +106,7 @@
                                             <div class="mb-4 row">
                                                 <label for="description_{{ $code }}"
                                                     class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>Description ({{ $language }})
+                                                    Description ({{ $language }})
                                                 </label>
                                                 <div class="col-sm-9">
                                                     <textarea class="form-control" id="description_{{ $code }}" name="description[{{ $code }}]"
@@ -257,22 +257,6 @@
                 //     url: "Please enter a valid URL."
                 // }
             };
-
-            @foreach (getSupportedLanguages() as $langCode => $langName)
-                rules["title[{{ $langCode }}]"] = {
-                    required: true
-                };
-                messages["title[{{ $langCode }}]"] = {
-                    required: "{{ __('admin.errors.title.required') }} ({{ $langName }})"
-                };
-
-                rules["description[{{ $langCode }}]"] = {
-                    required: true
-                };
-                messages["description[{{ $langCode }}]"] = {
-                    required: "Description is required ({{ $langName }})."
-                };
-            @endforeach
 
             $("#main_form").validate({
                 rules: rules,

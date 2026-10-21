@@ -75,9 +75,9 @@ class ContentController extends Controller
     {
         $request->validate([
             'title' => 'required|array',
-            'title.*' => 'required|string|max:255',
+            'title.*' => 'nullable|string|max:255',
             'details' => 'required|array',
-            'details.*' => 'required|string',
+            'details.*' => 'nullable|string',
         ]);
 
         $uniqueId = $content->unique_id;

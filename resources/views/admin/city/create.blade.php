@@ -35,7 +35,7 @@
                                             <div class="mb-4 row">
                                                 <label for="event_category_{{ $code }}"
                                                     class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>City
+                                                    City
                                                     ({{ $language }})
                                                 </label>
                                                 <div class="col-sm-9">
@@ -116,15 +116,6 @@
             // Dynamically build rules/messages based on supported languages
             const rules = {};
             const messages = {};
-
-            @foreach (getSupportedLanguages() as $langCode => $langName)
-                rules["city_name[{{ $langCode }}]"] = {
-                    required: true
-                };
-                messages["city_name[{{ $langCode }}]"] = {
-                    required: "{{ __('admin.errors.city_name.required') }} ({{ $langCode }})"
-                };
-            @endforeach
 
             $("#main_form").validate({
                 rules: rules,

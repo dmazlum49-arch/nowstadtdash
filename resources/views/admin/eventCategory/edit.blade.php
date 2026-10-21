@@ -34,7 +34,7 @@
                                             <div class="row mb-4">
                                                 <label for="event_category_{{ $code }}"
                                                     class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>Event Category
+                                                    Event Category
                                                     ({{ $language }})
                                                 </label>
                                                 <div class="col-sm-9">
@@ -90,7 +90,6 @@
 
             @foreach (getSupportedLanguages() as $lang => $label)
                 rules["event_category[{{ $lang }}]"] = {
-                    required: true,
                     remote: {
                         type: 'get',
                         url: "{{ route('admin.event-category.check-name-edit') }}",
@@ -105,7 +104,6 @@
                     },
                 };
                 messages["event_category[{{ $lang }}]"] = {
-                    required: "{{ __('admin.errors.event_category.required') }} ({{ strtoupper($lang) }})",
                     remote: "{{ __('admin.errors.event_category.remote') }} ({{ strtoupper($lang) }})"
                 };
             @endforeach

@@ -163,9 +163,9 @@ class HomeBannerController extends Controller
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'link' => 'nullable|string|url',
             'title' => 'required|array',
-            'title.*' => 'required|string',
+            'title.*' => 'nullable|string',
             'description' => 'required|array',
-            'description.*' => 'required|string',
+            'description.*' => 'nullable|string',
         ]);
 
         $uniqueId = $home_banner->unique_id;

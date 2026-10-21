@@ -253,3 +253,18 @@ Two traps:
   enhances those too, and the script marks each row `.nw-upload-row` so the stylesheet can
   lay the card out next to the page's own "X" remove-row button (otherwise the button
   stretches to the card's full height).
+
+## Language fields are optional (2026-10-21)
+
+Every create/edit view with language tabs (home banner, business/event category, city,
+contents) no longer marks its per-language fields as required: the
+`<span class="text-danger">*</span>` is gone from those labels, and neither the jQuery
+`validate()` rules nor the server rules require them (`.*` => `nullable`). Only the image
+field keeps its marker.
+
+One trap this exposed: Laravel's `ConvertEmptyStringsToNull` middleware turns a blank
+language input into `null`, while `business_categories.business_category`,
+`event_categories.event_category`, `cities.city_name` and `contents.title/content` are
+**NOT NULL** columns — the inserts answered 500. Every language insert/update now coerces
+with `?? ''`, so a record always keeps one row per language. Skipping the empty row instead
+would hide the record: the admin lists filter on `language = 'en'`.

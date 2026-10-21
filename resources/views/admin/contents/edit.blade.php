@@ -36,7 +36,7 @@
                                             id="tab-{{ $code }}" role="tabpanel">
                                             <div class="row mb-4">
                                                 <label for="title_{{ $code }}" class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>Title ({{ strtoupper($code) }})
+                                                    Title ({{ strtoupper($code) }})
                                                 </label>
                                                 <div class="col-sm-9">
                                                     <input class="form-control" type="text"
@@ -48,7 +48,7 @@
 
                                             <div class="row mb-4">
                                                 <label for="content_{{ $code }}" class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>Details ({{ strtoupper($code) }})
+                                                    Details ({{ strtoupper($code) }})
                                                 </label>
                                                 <div class="col-sm-9">
                                                     <textarea class="form-control tinymce-editor" id="content_{{ $code }}" name="details[{{ $code }}]"
@@ -91,30 +91,8 @@
 
             $("#main_form").validate({
                 ignore: [],
-                rules: {
-                    @foreach (getSupportedLanguages() as $code => $lang)
-                        "title[{{ $code }}]": {
-                            required: true
-                        },
-                        "details[{{ $code }}]": {
-                            required: function(textarea) {
-                                return tinymce.get('content_{{ $code }}')?.getContent({
-                                    format: 'text'
-                                }).trim() === "";
-                            }
-                        },
-                    @endforeach
-                },
-                messages: {
-                    @foreach (getSupportedLanguages() as $code => $lang)
-                        "title[{{ $code }}]": {
-                            required: "{{ __('admin.errors.title.required') }} ({{ strtoupper($code) }})"
-                        },
-                        "details[{{ $code }}]": {
-                            required: "{{ __('admin.errors.details.required') }} ({{ strtoupper($code) }})"
-                        },
-                    @endforeach
-                },
+                rules: {},
+                messages: {},
                 errorClass: "text-danger",
                 errorElement: "small",
                 highlight: function(element) {

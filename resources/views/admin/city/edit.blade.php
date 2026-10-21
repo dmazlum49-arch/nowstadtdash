@@ -34,7 +34,7 @@
                                             <div class="row mb-4">
                                                 <label for="city_{{ $code }}"
                                                     class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>City
+                                                    City
                                                     ({{ $language }})
                                                 </label>
                                                 <div class="col-sm-9">
@@ -116,15 +116,6 @@
         $(document).ready(function() {
             let rules = {};
             let messages = {};
-
-            @foreach (getSupportedLanguages() as $lang => $label)
-                rules["city_name[{{ $lang }}]"] = {
-                    required: true
-                };
-                messages["city_name[{{ $lang }}]"] = {
-                    required: "{{ __('admin.errors.city_name.required') }} ({{ strtoupper($lang) }})"
-                };
-            @endforeach
 
             $("#main_form").validate({
                 rules: rules,

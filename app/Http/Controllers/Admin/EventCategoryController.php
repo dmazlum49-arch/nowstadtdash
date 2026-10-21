@@ -104,7 +104,7 @@ class EventCategoryController extends Controller
 
         foreach ($input as $lang => $name) {
             EventCategory::create([
-                'event_category' => $name,
+                'event_category' => $name ?? '',
                 'language' => $lang,
                 'unique_id' => $uniqueId,
             ]);
@@ -134,7 +134,7 @@ class EventCategoryController extends Controller
     {
         $request->validate([
             'event_category' => 'required|array',
-            'event_category.*' => 'required|string|max:255',
+            'event_category.*' => 'nullable|string|max:255',
         ]);
 
         $uniqueId = $event_category->unique_id;
@@ -145,11 +145,11 @@ class EventCategoryController extends Controller
                 ->first();
 
             if ($category) {
-                $category->event_category = $name;
+                $category->event_category = $name ?? '';
                 $category->save();
             } else {
                 EventCategory::create([
-                    'event_category' => $name,
+                    'event_category' => $name ?? '',
                     'language' => $lang,
                     'unique_id' => $uniqueId,
                 ]);

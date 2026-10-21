@@ -132,7 +132,7 @@ class BusinessCategoryController extends Controller
 
         foreach ($input as $lang => $name) {
             BusinessCategory::create([
-                'business_category' => $name,
+                'business_category' => $name ?? '',
                 'language' => $lang,
                 'unique_id' => $uniqueId,
                 'image' => $imagePath,
@@ -167,7 +167,7 @@ class BusinessCategoryController extends Controller
         // $business_category->save();
         $request->validate([
             'business_category' => 'required|array',
-            'business_category.*' => 'required|string|max:255',
+            'business_category.*' => 'nullable|string|max:255',
         ]);
 
         $uniqueId = $business_category->unique_id;
@@ -192,12 +192,12 @@ class BusinessCategoryController extends Controller
                 ->first();
 
             if ($category) {
-                $category->business_category = $name;
+                $category->business_category = $name ?? '';
                 $category->image = $imagePath;
                 $category->save();
             } else {
                 BusinessCategory::create([
-                    'business_category' => $name,
+                    'business_category' => $name ?? '',
                     'language' => $lang,
                     'unique_id' => $uniqueId,
                     'image' => $imagePath,

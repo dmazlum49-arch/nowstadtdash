@@ -79,7 +79,7 @@
                                             <div class="mb-4 row">
                                                 <label for="business_category_{{ $code }}"
                                                     class="col-sm-3 col-form-label">
-                                                    <span class="text-danger">*</span>Business Category
+                                                    Business Category
                                                     ({{ $language }})
                                                 </label>
                                                 <div class="col-sm-9">
@@ -241,7 +241,6 @@
 
             @foreach (getSupportedLanguages() as $langCode => $langName)
                 rules["business_category[{{ $langCode }}]"] = {
-                    required: true,
                     remote: {
                             type: 'get',
                             url: "{{ route('admin.business-category.check-name') }}",
@@ -253,7 +252,6 @@
                         },
                 };
                 messages["business_category[{{ $langCode }}]"] = {
-                    required: "{{ __('admin.errors.business_category.required') }} ({{ $langName }})",
                     remote: "{{ __('admin.errors.business_category.remote') }} ({{ $langName }})"
                 };
             @endforeach
