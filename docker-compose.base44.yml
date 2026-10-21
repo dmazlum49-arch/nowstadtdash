@@ -1,0 +1,103 @@
+# Base44 sandbox environment for the Nowstadt dashboard (Laravel 10).
+#
+#   docker compose -f docker-compose.base44.yml up -d --build
+#
+# The app runs from the cloned source (repo bind-mounted, dependencies installed
+# at container start), so edits are picked up without rebuilding the image.
+# The user-facing entry point is host port 3000.
+name: nowstadtdash
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.base44
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env.base44-defaults # dev placeholders — lowest precedence
+      - /run/base44/app.env # platform-supplied secrets — always wins
+    environment:
+      - BASE44_PREVIEW_MODE
+      # Resolved by .env.base44-defaults to build APP_URL on the public preview origin.
+      - BASE44_PUBLIC_HOST_SUFFIX
+      # Sandbox only: the uploaded repo ships no composer.lock, so dependencies
+      # must be resolved fresh, and Composer 2.10 refuses every Laravel 10 release
+      # ("affected by security advisories"). Restoring the project's composer.lock
+      # is the real fix; until then this lets the dev environment install.
+      - COMPOSER_NO_BLOCKING=1
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=nowstadtdash
+      - DB_USERNAME=nowstadt
+      - DB_PASSWORD=nowstadt
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # PHP's built-in dev server is single-threaded: it handles one request at a
+      # time, so the browser's parallel requests (the page plus its assets) queue
+      # behind each other. Several workers remove that serialisation.
+      - PHP_CLI_SERVER_WORKERS=6
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command:
+      - sh
+      - -ec
+      - |
+        # Laravel needs these writable directories; the repo does not ship them.
+        mkdir -p storage/framework/cache storage/framework/sessions \
+                 storage/framework/views storage/app/public storage/logs \
+                 bootstrap/cache
+        composer install --no-interaction --prefer-dist --no-progress
+        # server-preview.php serves the isolated admin-UI preview at "/" and hands
+        # every other path to Laravel (same as `php artisan serve` did).
+        exec php -S 0.0.0.0:3000 -t public server-preview.php
+    healthcheck:
+      # Probes the isolated admin-UI preview served at "/" (the entry the Base44 preview
+      # shows) and requires the shell markup to be present, so a blank or error page fails.
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/ | grep -q 'layout-wrapper' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    restart: on-failure
+    labels:
+      base44.project: "Nowstadt Dashboard"
+      base44.kind: web
+      base44.port: "3000"
+
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_DATABASE=nowstadtdash
+      - MYSQL_USER=nowstadt
+      - MYSQL_PASSWORD=nowstadt
+      - MYSQL_ROOT_PASSWORD=nowstadt_root
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    restart: on-failure
+
+  redis:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: on-failure
+
+volumes:
+  mysql-data:

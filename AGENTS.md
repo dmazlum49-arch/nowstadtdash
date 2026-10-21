@@ -1,0 +1,172 @@
+# Nowstadt dashboard — sandbox notes
+
+Laravel 10 app (PHP 8.2). This file records only what is not obvious from the manifests.
+
+## The repo arrived as a flat upload — the nesting was reconstructed
+
+The repository was uploaded flat twice: first the application code, then (2026-10-21)
+`resources/` and `public/`'s assets, each time with the directory nesting stripped.
+Both times the files were re-assembled into the standard Laravel layout:
+
+| Now in the repo | Came from (flat upload) |
+| --- | --- |
+| `app/{Console,Exceptions,Helpers,Http,Mail,Models,Providers,Services}` | the same names at the repository root |
+| `database/migrations/` (114 files) | the `YYYY_MM_DD_NNNNNN_*.php` files at the root |
+| `database/{factories,seeders}` | `factories/`, `seeders/` at the root |
+| `resources/views/{admin,user,layouts,emails}` + `resources/views/welcome.blade.php` | the same names at the repository root |
+| `resources/lang/{de,en}` | `lang/` at the root — but the upload landed them at `resources/lang/lang/{de,en}`, so **every `__()` key rendered as its raw key** ("admin.dashboard" as the page heading). Moved up to `resources/lang/{en,de}` on 2026-10-21; `app()->langPath()` is `/var/www/html/resources/lang`, so that is where the loader looks. |
+| `resources/{css,js}` | `css/`, `js/` at the root (Vite entry points) |
+| `public/assets/admin/{css,js,images,fonts}` | `public/{css,js,images,fonts}` |
+| `public/assets/admin/libs/{jquery,jquery-validation,metismenu,simplebar,node-waves,toastr,sweetalert2,fancybox,tinymce,datatables.net*}` | the same names directly under `public/` |
+| `public/{index.php,favicon.ico,robots.txt,default/}` | same files at the root |
+
+The nesting is a reconstruction, not a copy of the original tree: the layouts and CSS
+reference everything as `assets/admin/...` (`url('assets/admin/css/app.css')`,
+`../fonts/boxicons.woff2`, `../images/...`), which is what drove the mapping. If a view
+references a path that 404s, compare it with the upload and move the folder.
+
+**Files the upload never included** (verified absent — nothing else in the app is missing):
+
+| Missing file | Effect |
+| --- | --- |
+| `public/assets/admin/libs/bootstrap/js/bootstrap.bundle.min.js` | Bootstrap's JS never loads (the CSS does). Dropdowns/collapse/modals in the admin and user panels will not open. |
+| `public/default/no_image.png` | `checkFileExist()` falls back to this placeholder, so every missing image (e.g. the login logo) renders as a broken image. |
+| `public/assets/admin/images/bg-auth-overlay.png`, `public/assets/admin/images/crypto/bg-ico-hero.jpg` | Referenced by `assets/admin/css/app.css`; cosmetic only. |
+| `.env.example` | No record of the expected environment variables; the list below was inferred from `env()` calls in `app/` + `config/`. |
+
+## No backend overrides — the preview is a static mock
+
+The Base44 preview serves an **isolated static mock** of the admin shell at `/`
+(`public/preview/index.html`), so the redesign is visible without a session and without
+touching the application. Consequently **no backend code is overridden**: routes,
+controllers, providers, middleware, authentication, models and database logic are exactly
+as the app ships them. `app/Providers/AppServiceProvider.php` carries no sandbox-only
+branch; the only sandbox-specific values are the `.env.base44-defaults` placeholders
+(`APP_URL` points at the public preview origin) and the compose service wiring.
+
+## Running the sandbox environment
+
+```bash
+docker compose -f docker-compose.base44.yml up -d --build
+docker compose -f docker-compose.base44.yml ps
+docker compose -f docker-compose.base44.yml logs -f app
+```
+
+- `app` — PHP 8.2 CLI (`Dockerfile.base44`), repo bind-mounted at `/var/www/html`, runs
+  `composer install` at container start and serves `server-preview.php` on **host port 3000**
+  (the preview entry point; it serves the static mock at `/` and hands every other path to
+  Laravel).
+- `mysql` — MySQL 8, database `nowstadtdash`, user `nowstadt` / `nowstadt`.
+- `redis` — Redis 7 (`REDIS_CLIENT` defaults to `phpredis`, which the image provides).
+
+Migrations were applied on 2026-10-21 (`php artisan migrate --force`, 114 migrations +
+the two permission seeders). The `mysql-data` volume keeps that schema; re-running
+`migrate` is a no-op.
+
+Environment variables: `.env.base44-defaults` (committed dev placeholders) is loaded first
+and `/run/base44/app.env` (Base44 dashboard secrets) last, so dashboard values always win.
+Local infrastructure credentials are inline in the compose `environment:` block on purpose
+— nothing there can shadow a dashboard value.
+
+### Verifying the app actually works
+
+The public entry points render without credentials:
+
+```bash
+for r in / /login /sign-up /forgot-password /panel/login; do
+  printf '%-18s ' "$r"; curl -s -o /dev/null -w '%{http_code}\n' "http://localhost:3000$r"
+done
+# / -> 200 (the static preview mock); the rest -> 200
+```
+
+`/` is served by the static preview mock (`public/preview/index.html`), which is what the
+healthcheck probes — it requires the shell markup (`layout-wrapper`) to be present, so a
+blank or error page fails. The application's own routes still render without credentials
+(`/login`, `/sign-up`, `/forgot-password`, `/panel/login` all answer 200; a missing Blade
+view would be a 500). Anything a panel page pulls from `assets/admin/...` should answer 200
+as well.
+
+## State the sandbox left behind
+
+- `composer.lock` was generated *by this sandbox* (`composer update`), because the repo
+  ships none and Composer 2.10 refuses to resolve any Laravel 10 release ("affected by
+  security advisories"). `COMPOSER_NO_BLOCKING=1` is set on the `app` service for the same
+  reason — sandbox-only, never carry it into CI or production. If you have the project's own
+  lockfile, delete this one and upload yours; it is the authoritative pin.
+- `storage/framework/{cache,sessions,views}`, `storage/logs` and `bootstrap/cache` are
+  created by the compose command because the repo does not ship them. `.gitignore` keeps
+  those runtime files, `vendor/` and `node_modules/` out of git.
+- `APP_KEY` in `.env.base44-defaults` is a generated sandbox placeholder. Replace it with
+  the project's real key if this workspace must read data encrypted with it.
+- The PHP image installs `pdo_mysql, mbstring, zip, gd, bcmath, intl, exif, pcntl, opcache`
+  and the `redis` extension. `php-ffmpeg` additionally needs an `ffmpeg` binary at runtime
+  (HLS columns exist in the schema, so media conversion is part of the product) — add it to
+  `Dockerfile.base44` when that flow is exercised.
+- No queue worker / scheduler / websocket service is defined yet: `config/queue.php`
+  defaults to `sync`; the Ratchet socket server (`Console/Commands/RunSocket.php`) and the
+  scheduled commands (`events:send-reminders`, `business:weekly-summary`) need their own
+  compose services to actually run.
+- The Vite pipeline is not wired into compose yet. The panel layouts load their CSS/JS from
+  `public/assets/admin/...` directly, so the pages render without it; only the `resources/css`
+  and `resources/js` entry points declared in `vite.config.js` would need a Vite dev server
+  or `npm run build`.
+- External services the code expects (real credentials belong in the Base44 dashboard
+  secrets, never in the repo — the names were inferred from `env()` usage):
+  AWS S3 (`config/constants.php` hardcodes `'upload_type' => 's3'`, so uploads need
+  `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_BUCKET` / `AWS_DEFAULT_REGION`) and
+  optionally SQS/SES; AWS MediaConvert (the `mediaconvert/callback` webhook); OpenAI
+  (`OPENAI_API_KEY`); Stripe (`STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`); Twilio
+  (`TWILIO_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`, `TWILIO_VERIFY_SERVICE_SID`);
+  Firebase Cloud Messaging (`config/constants.php` expects the credentials JSON at
+  `public/default/fcm_config.json` — that file *is* present, but it holds no real project
+  credentials). `ABLY_KEY` / Pusher keys are only needed if broadcasting is enabled.
+
+## Admin UI redesign + isolated preview
+
+The admin panel's look is restyled by **`public/assets/admin/css/nowstadt-theme.css`**, a
+presentation-only design system (tokens, then shell/sidebar/topbar/cards/tables/forms/
+buttons/badges/responsive) loaded after `app.css` / `app-change.css` from
+`resources/views/layouts/admin/app.blade.php`. It fixes two defects the old overrides
+introduced — the `.mm-active` menu item's `font-size: 200px` and the neon green
+`.text-primary` (`#00ff40`), unreadable on white — and replaces the loud gradient stat
+icons with soft tinted chips.
+
+Two traps when editing it:
+
+- The stat cards carry Bootstrap's `bg-primary` **utility** on the icon chip, and that
+  rule is `!important`. Tint overrides for `.mini-stat-icon` need `!important` *and*
+  the `.card.mini-stats-wid` ancestor, or the chips stay solid blue and the coloured
+  glyphs on top become unreadable.
+- `app-change.css` also uses `!important` on `.mm-active > a` and `.navbar-brand-box`,
+  so sidebar overrides have to out-rank it.
+
+Section 15 of the file ("Inner pages") carries the list / create / edit treatment that reaches
+every non-dashboard page **without touching their markup**. Admin list pages render a leading
+`.text-end` action block before their `.card-title` (verified in all 16 list views), so that
+block is lifted to the card's top-right (absolute, with a padding reserve on the title) and
+falls back to a stacked layout under 576px. Create/edit `.col-form-label` rows and in-card
+`.nav-tabs` are matched to the system as well. The isolated mock at `public/preview/index.html`
+mirrors that real markup (list + form patterns), so CSS edits show up there immediately.
+
+`resources/views/admin/general/dashboard.blade.php` carries the redesigned overview
+(page header + "Platform overview" / "Approvals" / "Catalog" groups); every route and
+count variable is unchanged. No markup semantics, routes, controllers, providers,
+middleware, models or database code were touched.
+
+The preview serves an **isolated static mock** at `/` so the shell is visible without a
+session and without any backend change (the mock mirrors the real Blade markup and links
+the same stylesheets, so CSS edits show up in it immediately):
+
+- `public/preview/index.html` — the admin shell (topbar, sidebar, breadcrumb, stat cards,
+  list/table, form) built from the real Blade markup and the real stylesheets, with mock
+  data. CSS edits show up in it immediately because it links the same CSS files; only the
+  static markup would need updating to mirror a view change.
+- `server-preview.php` — a preview-only router that serves that file at `/` and passes
+  every other path to Laravel unchanged. `docker-compose.base44.yml` starts the dev server
+  with it (`php -S 0.0.0.0:3000 -t public server-preview.php`). Laravel never loads this
+  file; delete it and switch the command back to `php artisan serve` to drop the preview.
+
+The application itself is unchanged and still reachable at its own routes (`/login`,
+`/panel/login`, …). To browse the real admin panel, sign in at `/panel/login` with the
+dev admin seeded by `UserSeeder` (`admin@gmail.com` / `123456`; `RolePermissionSeeder`
+must also have run so the `Super Admin` role is assigned, otherwise list pages return 403).
