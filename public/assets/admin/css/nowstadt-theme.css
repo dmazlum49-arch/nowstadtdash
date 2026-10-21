@@ -23,6 +23,16 @@
      12. Badges, alerts, dropdowns, pagination, modals
      13. Footer
      14. Responsive
+     15. Inner pages (list / create / edit)
+     16. Bootstrap theme bridge (Skote's palette → Nowstadt)
+     17. Status labels & positive states
+     18. Inputs: selects, dates, uploads, validation
+     19. Tabs & pills
+     20. Modals, confirmation dialogs & overlays
+     21. Notifications (toastr)
+     22. Loading & empty states
+     23. Tables: responsive chrome
+     24. Mobile refinements
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -35,6 +45,12 @@
     --nw-blue-700: #1e40af;
     --nw-blue-50: #eef4ff;
     --nw-blue-100: #dbe6ff;
+
+    /* Brand — Nowstadt green: success, rewards, location and positive states */
+    --nw-green: #16a34a;
+    --nw-green-600: #15803d;
+    --nw-green-50: #eefbf3;
+    --nw-green-100: #d1fae5;
 
     /* Sidebar — deep navy */
     --nw-navy-900: #0b1229;
@@ -69,8 +85,8 @@
     --nw-shadow-lg: 0 18px 40px -12px rgba(15, 23, 42, .18);
     --nw-ring: 0 0 0 3px rgba(37, 99, 235, .14);
 
-    /* Status */
-    --nw-success: #059669;
+    /* Status — success and every positive state use the Nowstadt green */
+    --nw-success: var(--nw-green);
     --nw-warning: #d97706;
     --nw-danger: #dc2626;
     --nw-violet: #7c3aed;
@@ -873,4 +889,504 @@ label {
         text-align: left;
     }
     .card-body > .text-end:first-child + .card-title { padding-right: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   16. Bootstrap theme bridge
+   --------------------------------------------------------------------------
+   The panel runs on Bootstrap 5 with Skote's compiled palette (primary
+   #556ee6, success #34c38f, Poppins). Re-pointing Bootstrap's own custom
+   properties brings the few components this file does not restyle
+   individually onto the Nowstadt palette, so no screen keeps the old accent.
+   -------------------------------------------------------------------------- */
+:root {
+    --bs-primary: #2563eb;
+    --bs-primary-rgb: 37, 99, 235;
+    --bs-secondary: #64748b;
+    --bs-secondary-rgb: 100, 116, 139;
+    --bs-success: #16a34a;
+    --bs-success-rgb: 22, 163, 74;
+    --bs-info: #0e7490;
+    --bs-info-rgb: 14, 116, 144;
+    --bs-warning: #d97706;
+    --bs-warning-rgb: 217, 119, 6;
+    --bs-danger: #dc2626;
+    --bs-danger-rgb: 220, 38, 38;
+    --bs-light: #f8fafc;
+    --bs-light-rgb: 248, 250, 252;
+    --bs-dark: #0f172a;
+    --bs-dark-rgb: 15, 23, 42;
+    --bs-body-font-family: var(--nw-font);
+    --bs-border-radius: 10px;
+    --bs-border-radius-sm: 8px;
+    --bs-border-radius-lg: 14px;
+    --bs-border-radius-xl: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   17. Status labels & positive states
+   --------------------------------------------------------------------------
+   get_badge_html() and the DataTables controllers render status as
+   `badge bg-success|bg-danger|bg-primary` — Bootstrap's solid utilities. The
+   soft tints below out-rank those utilities, so a column of statuses reads as
+   calm labels instead of a wall of saturated blocks. Green carries every
+   positive state: success, rewards, location.
+   -------------------------------------------------------------------------- */
+.badge.bg-success,
+.badge.bg-danger,
+.badge.bg-primary,
+.badge.bg-warning,
+.badge.bg-info,
+.badge.bg-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background-image: none !important;
+    border: 1px solid transparent;
+    font-weight: 600;
+    padding: .38em .72em;
+}
+
+.badge.bg-success:before,
+.badge.bg-danger:before,
+.badge.bg-primary:before,
+.badge.bg-warning:before,
+.badge.bg-info:before,
+.badge.bg-secondary:before {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.badge.bg-success { background-color: #ecfdf5 !important; color: var(--nw-green-600) !important; border-color: var(--nw-green-100); }
+.badge.bg-danger { background-color: #fef2f2 !important; color: #b91c1c !important; border-color: #fecaca; }
+.badge.bg-primary { background-color: var(--nw-blue-50) !important; color: var(--nw-blue-700) !important; border-color: var(--nw-blue-100); }
+.badge.bg-warning { background-color: #fffbeb !important; color: #b45309 !important; border-color: #fde68a; }
+.badge.bg-info { background-color: #ecfeff !important; color: #0e7490 !important; border-color: #a5f3fc; }
+.badge.bg-secondary { background-color: #f1f5f9 !important; color: #475569 !important; border-color: #e2e8f0; }
+
+.badge.fs-6 { font-size: 12px !important; }
+
+/* text used to mark a positive, reward or location value */
+.text-success { color: var(--nw-green-600) !important; }
+
+/* --------------------------------------------------------------------------
+   18. Inputs: selects, dates, uploads, validation
+   -------------------------------------------------------------------------- */
+
+/* native select (Bootstrap 5 .form-select) */
+.form-select {
+    border: 1px solid var(--nw-field-line);
+    border-radius: var(--nw-radius-sm);
+    min-height: 40px;
+    padding: .45rem 2.1rem .45rem .85rem;
+    font-size: 13.5px;
+    color: var(--nw-ink);
+    background-color: #fff;
+    background-position: right .8rem center;
+    background-size: 14px 11px;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.form-select:focus { border-color: var(--nw-blue); box-shadow: var(--nw-ring); }
+
+/* date and time fields keep their native picker; this only brings the box and
+   the picker indicator onto the system */
+input[type="date"].form-control,
+input[type="time"].form-control,
+input[type="datetime-local"].form-control,
+input[type="month"].form-control {
+    color-scheme: light;
+    min-height: 40px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+    opacity: .45;
+    cursor: pointer;
+    transition: opacity .16s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="month"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+/* uploads — a real button inside the field instead of the browser default */
+input[type="file"].form-control {
+    padding: .3rem .5rem;
+    min-height: 40px;
+    line-height: 1.9;
+    color: var(--nw-muted);
+}
+
+input[type="file"].form-control::file-selector-button {
+    margin-right: .7rem;
+    padding: .4rem .9rem;
+    border: 1px solid var(--nw-field-line);
+    border-radius: var(--nw-radius-xs);
+    background: var(--nw-surface-alt);
+    color: var(--nw-ink-soft);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .16s ease, color .16s ease, border-color .16s ease;
+}
+
+input[type="file"].form-control:hover::file-selector-button {
+    background: var(--nw-blue-50);
+    border-color: var(--nw-blue-100);
+    color: var(--nw-blue-700);
+}
+
+input[type="file"].form-control::-webkit-file-upload-button {
+    margin-right: .7rem;
+    padding: .4rem .9rem;
+    border: 1px solid var(--nw-field-line);
+    border-radius: var(--nw-radius-xs);
+    background: var(--nw-surface-alt);
+    color: var(--nw-ink-soft);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* cropper preview boxes: the create/edit views ship an inline red border */
+body .preview {
+    border: 1px solid var(--nw-line);
+    border-radius: var(--nw-radius-sm);
+    background: var(--nw-surface-alt);
+    margin: 10px 0;
+    width: 160px;
+    height: 160px;
+    overflow: hidden;
+}
+
+body .img_75 {
+    border: 1px solid var(--nw-line);
+    border-radius: var(--nw-radius-xs);
+    padding: 2px;
+    background: #fff;
+}
+
+/* input groups read as one control */
+.input-group > .form-control,
+.input-group > .form-select { border-radius: var(--nw-radius-sm); }
+.input-group > :not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.input-group > :not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.input-group-text { white-space: nowrap; }
+
+/* validation */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #fca5a5;
+    background-image: none;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus { box-shadow: 0 0 0 3px rgba(220, 38, 38, .14); }
+
+.invalid-feedback { margin-top: .3rem; }
+.invalid-feedback,
+small.text-danger { font-size: 12.5px; }
+
+/* switches (users/show) */
+.form-switch .form-check-input {
+    width: 2.4em;
+    height: 1.3em;
+    margin-top: .15em;
+    background-color: #e2e8f0;
+    border-color: #e2e8f0;
+    cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--nw-green);
+    border-color: var(--nw-green);
+}
+
+.form-check-input[type="checkbox"],
+.form-check-input[type="radio"] { cursor: pointer; }
+.form-check-label { cursor: pointer; }
+
+/* select2 — the notification, boost and event forms */
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid var(--nw-field-line);
+    border-radius: var(--nw-radius-sm);
+    min-height: 40px;
+    padding: .2rem .35rem;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: var(--nw-blue);
+    box-shadow: var(--nw-ring);
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background: var(--nw-blue-50);
+    border: 1px solid var(--nw-blue-100);
+    border-radius: 999px;
+    color: var(--nw-blue-700);
+    font-size: 12.5px;
+    padding: .12rem .55rem;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: var(--nw-blue-700);
+    border-right: 0;
+    margin-right: .3rem;
+}
+
+.select2-dropdown {
+    border: 1px solid var(--nw-line);
+    border-radius: var(--nw-radius);
+    box-shadow: var(--nw-shadow-lg);
+    overflow: hidden;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid var(--nw-field-line);
+    border-radius: var(--nw-radius-xs);
+    padding: .4rem .6rem;
+}
+
+.select2-container--default .select2-results__option { font-size: 13.5px; padding: .45rem .7rem; }
+
+.select2-container--default .select2-results__option--highlighted[aria-selected],
+.select2-container--default .select2-results__option--highlighted[aria-selected]:hover {
+    background-color: var(--nw-blue);
+}
+
+/* --------------------------------------------------------------------------
+   19. Tabs & pills
+   -------------------------------------------------------------------------- */
+.nav-tabs { gap: .15rem; }
+
+.nav-tabs .nav-link {
+    padding: .6rem .95rem;
+    border-radius: var(--nw-radius-xs) var(--nw-radius-xs) 0 0;
+    font-size: 13.5px;
+}
+
+.nav-tabs .nav-link:focus { box-shadow: none; }
+
+.nav-pills { gap: .35rem; }
+
+.nav-pills .nav-link {
+    border-radius: 999px;
+    color: var(--nw-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: .45rem 1rem;
+}
+
+.nav-pills .nav-link:hover { background: var(--nw-surface-alt); color: var(--nw-ink); }
+
+.nav-pills .nav-link.active {
+    background: var(--nw-blue);
+    color: #fff;
+    font-weight: 600;
+}
+
+.tab-content > .tab-pane { padding-top: .25rem; }
+
+/* --------------------------------------------------------------------------
+   20. Modals, confirmation dialogs & overlays
+   -------------------------------------------------------------------------- */
+.modal-backdrop { background-color: #0b1229; }
+.modal-backdrop.show { opacity: .48; }
+.modal-dialog { margin: 1.25rem auto; }
+.modal-content { border: 0; }
+.modal-header { align-items: center; }
+.modal-title { line-height: 1.35; }
+
+.btn-close {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--nw-radius-xs);
+    background-size: 13px;
+    background-position: center;
+    opacity: .45;
+    transition: opacity .16s ease, background-color .16s ease;
+}
+
+.btn-close:hover { opacity: 1; background-color: var(--nw-surface-alt); }
+.btn-close:focus { opacity: 1; box-shadow: var(--nw-ring); }
+
+/* the create/edit views ship `.modal-lg { max-width: 1000px !important }`
+   inline, which overflows a phone; the two-class selector out-ranks it */
+@media (max-width: 991.98px) {
+    .modal-dialog.modal-lg { max-width: calc(100% - 1.5rem) !important; }
+}
+
+/* SweetAlert2 — every confirmation and result dialog */
+.swal2-popup {
+    border-radius: var(--nw-radius-lg);
+    padding: 1.75rem 1.5rem 1.5rem;
+    font-family: var(--nw-font);
+    color: var(--nw-body);
+    box-shadow: var(--nw-shadow-lg);
+}
+
+.swal2-title { font-size: 18px; font-weight: 600; color: var(--nw-ink); }
+.swal2-html-container { font-size: 13.5px; color: var(--nw-body); }
+.swal2-icon { width: 4.25rem; height: 4.25rem; margin: 0 auto 1.25rem; }
+.swal2-actions { gap: .6rem; margin-top: 1.5rem; }
+
+.swal2-styled {
+    border-radius: var(--nw-radius-sm);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: .55rem 1.2rem;
+    box-shadow: none !important;
+}
+
+.swal2-styled:focus { box-shadow: var(--nw-ring) !important; }
+.swal2-confirm { background-color: var(--nw-blue) !important; }
+.swal2-confirm:hover { background-color: var(--nw-blue-600) !important; }
+.swal2-cancel { background-color: #64748b !important; }
+.swal2-cancel:hover { background-color: #475569 !important; }
+.swal2-deny { background-color: var(--nw-danger) !important; }
+
+/* --------------------------------------------------------------------------
+   21. Notifications (toastr)
+   --------------------------------------------------------------------------
+   Every flash message and validation summary is rendered by toastr, which
+   ships a flat, saturated look that clashes with the panel. Its per-type icon
+   lives in `background-image`, so that is left alone.
+   -------------------------------------------------------------------------- */
+#toast-container > div {
+    opacity: 1;
+    width: 22rem;
+    padding: 15px 18px 15px 54px;
+    border-radius: var(--nw-radius);
+    box-shadow: var(--nw-shadow-lg);
+    background-size: 20px;
+    background-position: 18px center;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+#toast-container > div:hover { opacity: 1; box-shadow: var(--nw-shadow-lg); }
+#toast-container > .toast-success { background-color: var(--nw-green); }
+#toast-container > .toast-error { background-color: var(--nw-danger); }
+#toast-container > .toast-info { background-color: var(--nw-blue); }
+#toast-container > .toast-warning { background-color: var(--nw-warning); }
+#toast-container > div .toast-title { font-weight: 600; margin-bottom: .15rem; }
+#toast-container > div .toast-progress { height: 3px; opacity: .45; background-color: #fff; }
+#toast-container > div .toast-close-button { font-weight: 400; opacity: .8; text-shadow: none; }
+
+/* --------------------------------------------------------------------------
+   22. Loading & empty states
+   -------------------------------------------------------------------------- */
+.dataTables_wrapper { position: relative; }
+
+.dataTables_wrapper .dataTables_processing {
+    top: 50%;
+    left: 50%;
+    width: auto;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    padding: .7rem 1.2rem;
+    border: 1px solid var(--nw-line);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: var(--nw-shadow-lg);
+    color: var(--nw-ink-soft);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 5;
+}
+
+/* the empty table body — the one empty state the panel renders */
+table.dataTable td.dataTables_empty,
+table.dataTable th.dataTables_empty {
+    padding: 3rem 1rem;
+    background: var(--nw-surface-alt);
+    color: var(--nw-muted);
+    font-size: 13.5px;
+}
+
+.spinner-border,
+.spinner-grow { color: inherit; vertical-align: -.125em; }
+
+.btn .spinner-border { border-width: .15em; }
+
+/* --------------------------------------------------------------------------
+   23. Tables: responsive chrome
+   -------------------------------------------------------------------------- */
+.table-responsive { -webkit-overflow-scrolling: touch; }
+
+/* DataTables' responsive control — a chip instead of the default plus sign */
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before {
+    top: 50%;
+    left: .5rem;
+    margin-top: -8px;
+    width: 17px;
+    height: 17px;
+    line-height: 15px;
+    border: 1px solid var(--nw-blue-100);
+    border-radius: 6px;
+    background-color: var(--nw-blue-50);
+    color: var(--nw-blue);
+    box-shadow: none;
+    font-weight: 700;
+    text-indent: 0;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before {
+    background-color: var(--nw-blue);
+    border-color: var(--nw-blue);
+    color: #fff;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
+table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child { padding-left: 2rem; }
+
+/* the expanded child row */
+table.dataTable > tbody > tr.child ul.dtr-details { width: 100%; }
+table.dataTable > tbody > tr.child ul.dtr-details > li {
+    border-bottom: 1px solid var(--nw-line-soft);
+    padding: .5rem 0;
+}
+table.dataTable > tbody > tr.child ul.dtr-details > li:last-child { border-bottom: 0; }
+table.dataTable > tbody > tr.child span.dtr-title { font-weight: 600; color: var(--nw-ink-soft); }
+
+/* --------------------------------------------------------------------------
+   24. Mobile refinements
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .page-title-box { flex-wrap: wrap; gap: .5rem; }
+    .page-title-right { width: 100%; }
+    .page-title-box .breadcrumb { font-size: 12px; }
+    .modal-dialog { margin: .75rem auto; }
+    .modal-body { padding: 1.15rem; }
+    .modal-header,
+    .modal-footer { padding: .95rem 1.15rem; }
+    .card-title { font-size: 15px; }
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_info { text-align: left; }
+    .dataTables_wrapper .dataTables_paginate { text-align: left; }
+    .nav-tabs { flex-wrap: nowrap; overflow-x: auto; }
+    .nav-tabs .nav-link { white-space: nowrap; }
+    #toast-container > div { width: auto; margin: 0 0 .6rem; }
+}
+
+@media (max-width: 575.98px) {
+    .card { border-radius: var(--nw-radius-sm); }
+    .page-content { padding: calc(70px + 16px) 12px 36px 12px; }
+    .card-body { padding: 1.1rem 1rem; }
+    .btn { padding: .5rem .9rem; }
+    .swal2-popup { padding: 1.35rem 1rem 1.1rem; }
+    .swal2-title { font-size: 16.5px; }
 }

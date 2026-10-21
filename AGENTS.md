@@ -153,6 +153,38 @@ Two traps when editing it:
 - `app-change.css` also uses `!important` on `.mm-active > a` and `.navbar-brand-box`,
   so sidebar overrides have to out-rank it.
 
+### The component layer (sections 16–24 of the same file)
+
+Sections 1–15 are the shell and the everyday surfaces; 16–24 finish the system so every
+control the panel renders is on it:
+
+- **16 Bootstrap bridge** — the panel runs **Bootstrap 5.0.1 with Skote's compiled
+  palette** (primary `#556ee6`, success `#34c38f`, Poppins). Section 16 re-points the
+  `--bs-*` custom properties at the Nowstadt tokens, which catches the few components
+  the rest of the file does not restyle individually. Skote hardcodes most colours in
+  its compiled CSS, so the bridge is a safety net, not the main mechanism.
+- **17 Status labels** — `get_badge_html()` and the DataTables controllers render
+  `badge bg-success|bg-danger|bg-primary`, i.e. Bootstrap's **solid utilities**, which
+  are `!important`. The soft tints therefore need `!important` too, and they must stay
+  scoped to `.badge.bg-*` (a bare `bg-success` override would hit anything else using
+  that utility). Green carries every positive state: success, rewards, location.
+- **18 Inputs** — `.form-select`, native date/time fields, file uploads
+  (`::file-selector-button`, plus the `-webkit-` variant), input groups, validation,
+  switches and select2. Two of the create/edit views style the cropper preview box
+  inline (`.preview { border: 1px solid red }`); `body .preview` out-ranks that
+  inline `<style>` rule.
+- **19 Tabs & pills**, **20 modals + SweetAlert2**, **21 toastr notifications**,
+  **22 loading & empty states**, **23 DataTables responsive chrome**, **24 mobile**.
+- Traps found while building these:
+  - The create/edit views ship `.modal-lg { max-width: 1000px !important }` in their
+    own `<style>` block, which overflows a phone. Only a *more specific* selector wins
+    against a later same-specificity `!important`, hence `.modal-dialog.modal-lg`.
+  - toastr keeps its per-type icon in `background-image`; setting that to `none`
+    silently removes every notification icon.
+  - The base DataTables stylesheet is **not** linked (only the `-bs4` integrations), so
+    `div.dataTables_processing` is a plain class rule and can be restyled; the
+    responsive plugin's expand control is `td.dtr-control:before`.
+
 Section 15 of the file ("Inner pages") carries the list / create / edit treatment that reaches
 every non-dashboard page **without touching their markup**. Admin list pages render a leading
 `.text-end` action block before their `.card-title` (verified in all 16 list views), so that
