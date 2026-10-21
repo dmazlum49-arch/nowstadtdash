@@ -44,13 +44,6 @@ services:
       - sh
       - -ec
       - |
-        # The uploaded repository has no application code, so there is nothing
-        # to serve yet. Wait for it (instead of exiting, which would restart-
-        # loop the container) and start the app automatically once it appears.
-        while [ ! -f public/index.php ] || [ ! -d app ]; do
-          echo "Application source missing: app/ and public/index.php were never uploaded, so there is no entry point to serve yet — waiting for them." >&2
-          sleep 15
-        done
         # Laravel needs these writable directories; the repo does not ship them.
         mkdir -p storage/framework/cache storage/framework/sessions \
                  storage/framework/views storage/app/public storage/logs \
@@ -58,7 +51,9 @@ services:
         composer install --no-interaction --prefer-dist --no-progress
         exec php artisan serve --host=0.0.0.0 --port=3000
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:3000/ || exit 1"]
+      # -L follows the app's own "/" -> /login redirect, so the probe only passes
+      # when the login page actually renders (not merely when the router answers).
+      test: ["CMD-SHELL", "curl -fsSL -o /dev/null http://127.0.0.1:3000/ || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
