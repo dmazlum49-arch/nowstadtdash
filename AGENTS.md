@@ -50,8 +50,8 @@ so the generated URLs stay inside the preview's own origin. This is the only bac
 override — routes, controllers, middleware, authentication, models and database logic are
 untouched.
 
-The preview still serves an **isolated static mock** of the admin shell at `/`
-(`public/preview/index.html`) — see the last section.
+The preview's entry point `/` is redirected to the admin panel login (`/panel/login`) by
+`server-preview.php` — see the last section.
 
 ## Running the sandbox environment
 
@@ -63,7 +63,7 @@ docker compose -f docker-compose.base44.yml logs -f app
 
 - `app` — PHP 8.2 CLI (`Dockerfile.base44`), repo bind-mounted at `/var/www/html`, runs
   `composer install` at container start and serves `server-preview.php` on **host port 3000**
-  (the preview entry point; it serves the static mock at `/` and hands every other path to
+  (the preview entry point; it redirects `/` to `/panel/login` and hands every other path to
   Laravel).
 - `mysql` — MySQL 8, database `nowstadtdash`, user `nowstadt` / `nowstadt`.
 - `redis` — Redis 7 (`REDIS_CLIENT` defaults to `phpredis`, which the image provides).
@@ -85,15 +85,19 @@ The public entry points render without credentials:
 for r in / /login /sign-up /forgot-password /panel/login; do
   printf '%-18s ' "$r"; curl -s -o /dev/null -w '%{http_code}\n' "http://localhost:3000$r"
 done
-# / -> 200 (the static preview mock); the rest -> 200
+# / -> 302 (to /panel/login, the preview's entry point); the rest -> 200
 ```
 
-`/` is served by the static preview mock (`public/preview/index.html`), which is what the
-healthcheck probes — it requires the shell markup (`layout-wrapper`) to be present, so a
-blank or error page fails. The application's own routes still render without credentials
-(`/login`, `/sign-up`, `/forgot-password`, `/panel/login` all answer 200; a missing Blade
-view would be a 500). Anything a panel page pulls from `assets/admin/...` should answer 200
-as well.
+The healthcheck probes `/panel/login` and requires its form (`login-form`) to be present, so
+a blank or error page fails. Every public entry point renders without credentials (`/login`,
+`/sign-up`, `/forgot-password`, `/panel/login` all answer 200; a missing Blade view would be
+a 500). Anything a panel page pulls from `assets/admin/...` should answer 200 as well.
+
+The whole panel is reachable end to end with the seeded admin — sign in at `/panel/login`
+(username `admin` or `admin@gmail.com`, password `123456`) and `/panel` renders the
+dashboard. A `curl` login is enough to check it: fetch `/panel/login`, POST it with the
+`_token` cookie and the `username`/`password` fields, then GET `/panel` with the cookie jar
+(the login form posts `username`, not `email`).
 
 ## State the sandbox left behind
 
@@ -130,7 +134,7 @@ as well.
   `public/default/fcm_config.json` — that file *is* present, but it holds no real project
   credentials). `ABLY_KEY` / Pusher keys are only needed if broadcasting is enabled.
 
-## Admin UI redesign + isolated preview
+## Admin UI redesign + the preview entry point
 
 The admin panel's look is restyled by **`public/assets/admin/css/nowstadt-theme.css`**, a
 presentation-only design system (tokens, then shell/sidebar/topbar/cards/tables/forms/
@@ -154,30 +158,32 @@ every non-dashboard page **without touching their markup**. Admin list pages ren
 `.text-end` action block before their `.card-title` (verified in all 16 list views), so that
 block is lifted to the card's top-right (absolute, with a padding reserve on the title) and
 falls back to a stacked layout under 576px. Create/edit `.col-form-label` rows and in-card
-`.nav-tabs` are matched to the system as well. The isolated mock at `public/preview/index.html`
-mirrors that real markup (list + form patterns), so CSS edits show up there immediately.
+`.nav-tabs` are matched to the system as well. The theme reaches the real Blade views, so
+signing in and browsing the panel is how you see a CSS edit land.
 
 `resources/views/admin/general/dashboard.blade.php` carries the redesigned overview
 (page header + "Platform overview" / "Approvals" / "Catalog" groups); every route and
 count variable is unchanged. No markup semantics, routes, controllers, providers,
 middleware, models or database code were touched.
 
-The preview serves an **isolated static mock** at `/` so the shell is visible without a
-session and without any backend change (the mock mirrors the real Blade markup and links
-the same stylesheets, so CSS edits show up in it immediately):
+The preview serves the **real application**. An earlier sandbox session put an isolated
+static mock of the admin shell at `/` (`public/preview/index.html`, all links `href="#"`);
+it was removed on 2026-10-21 because it hid the real panel — the preview showed a shell whose
+every link was dead, so no page behind it could be opened. The redesign lives in
+`nowstadt-theme.css`, which the real views load, so nothing was lost with the mock.
 
-- `public/preview/index.html` — the admin shell (topbar, sidebar, breadcrumb, stat cards,
-  list/table, form) built from the real Blade markup and the real stylesheets, with mock
-  data. CSS edits show up in it immediately because it links the same CSS files; only the
-  static markup would need updating to mirror a view change.
-- `server-preview.php` — a preview-only router that serves that file at `/` and passes
-  every other path to Laravel unchanged. `docker-compose.base44.yml` starts the dev server
-  with it (`php -S 0.0.0.0:3000 -t public server-preview.php`). Laravel never loads this
-  file; delete it and switch the command back to `php artisan serve` to drop the preview.
+What is left is one preview-only router:
 
-The application itself is unchanged and still reachable at its own routes (`/login`,
-`/panel/login`, …). To browse the real admin panel, sign in at `/panel/login` with the
-dev admin from `UserSeeder` — username `admin` (or `admin@gmail.com`), password `123456`.
+- `server-preview.php` — redirects `/` to `/panel/login` and passes every other path to
+  Laravel unchanged. `docker-compose.base44.yml` starts the dev server with it
+  (`php -S 0.0.0.0:3000 -t public server-preview.php`). The redirect exists because the
+  app's own `/` sends visitors to the **business-user** login (`/login`), where an admin
+  account is rejected (`User\GuestController@postLogin` allows only `businessuser` /
+  `sub-businessuser`), so the panel would be unreachable from the preview's entry point.
+  Laravel never loads this file; delete it and start with `server.php` to drop the redirect
+  (the app's own `/` behaviour then applies unchanged).
+
+No route, controller, provider, middleware, model or database code was changed for this.
 The sandbox database was seeded on 2026-10-21 with `UserSeeder` (two admins, both
 `type=admin`, `status=active`) and `RolePermissionSeeder` (which assigns `Super Admin` to
 the first admin; without it the permission-gated pages answer 403). Both seeders are

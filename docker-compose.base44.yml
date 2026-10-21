@@ -55,13 +55,13 @@ services:
                  storage/framework/views storage/app/public storage/logs \
                  bootstrap/cache
         composer install --no-interaction --prefer-dist --no-progress
-        # server-preview.php serves the isolated admin-UI preview at "/" and hands
-        # every other path to Laravel (same as `php artisan serve` did).
+        # server-preview.php sends "/" to the admin panel login and hands every
+        # other path to Laravel (same as `php artisan serve` did).
         exec php -S 0.0.0.0:3000 -t public server-preview.php
     healthcheck:
-      # Probes the isolated admin-UI preview served at "/" (the entry the Base44 preview
-      # shows) and requires the shell markup to be present, so a blank or error page fails.
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/ | grep -q 'layout-wrapper' || exit 1"]
+      # Probes the real admin login page (the entry the Base44 preview shows) and
+      # requires its form to be present, so a blank or error page fails.
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/panel/login | grep -q 'login-form' || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10

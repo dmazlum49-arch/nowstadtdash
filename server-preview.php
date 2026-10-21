@@ -3,29 +3,29 @@
 /**
  * Base44 sandbox preview router.
  *
- * Serves the isolated admin-UI preview (public/preview/index.html) at "/" so the
- * dashboard redesign is visible in the Base44 preview without a signed-in session,
- * and passes every other request straight through to the Laravel application.
+ * The preview's entry point is "/". This app's own "/" redirects to the
+ * business-user login (/login), which rejects admin accounts, so the sandbox
+ * sends "/" to the admin panel login (/panel/login) instead: the preview then
+ * opens the panel this dashboard actually exposes and every page behind it is
+ * reachable after signing in. Every other request is passed straight through to
+ * the Laravel application, unchanged.
  *
- * This file is not part of the application: Laravel never loads it, and it is only
- * used because docker-compose.base44.yml starts the dev server with it. If the
- * preview file is absent, "/" falls through to Laravel exactly as before.
+ * This file is not part of the application: Laravel never loads it, and it is
+ * only used because docker-compose.base44.yml starts the dev server with it.
+ * Delete it and start the server with server.php to drop the redirect.
  */
 
 $uri = urldecode(
     parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 );
 
-$preview = __DIR__ . '/public/preview/index.html';
-
-if (($uri === '/' || $uri === '') && is_file($preview)) {
-    header('Content-Type: text/html; charset=UTF-8');
-    readfile($preview);
+if ($uri === '/' || $uri === '') {
+    header('Location: /panel/login', true, 302);
 
     return true;
 }
 
-if ($uri !== '/' && file_exists(__DIR__ . '/public' . $uri)) {
+if (file_exists(__DIR__ . '/public' . $uri)) {
     return false;
 }
 
