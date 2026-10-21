@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "nowstadt",
+  "private_key_id": "90360fed036ec1c88919d8ba145f2d33ab9baab6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDhYxTNwwN/3lIc\nxl5nr0SU+sPnzJHV2WAQ7WUnRKE5FHS+U/Z3QuA+C8BCMwzGKufQQgZUuEinEhXy\nfooRHtaJR2OeIrhyEPskOO9Jy1xXN4xzwo+lT6pdR2JfqDEfWmmUKXrL2uLx0vS4\nbBtYJ9qlw1VlKKX6geJdeAz8WqrZV4xA6g/t7FeKnpcdmFXOlvlY3OoGZchvb767\nhias03Q9a6KTzc8QtzMffMF2ItISflfw+miXgM70qPkTKAEYwYmdu7BAejo+pmKc\nRAXvkxb87G6GkNTVQ7rKByuyC1TiGWSQ1hnDD27a0Iz0N8M2Ifv0+KfrXgIJnilj\nM1Arj4O7AgMBAAECggEAGMu3vDNaLTUeP4ArXqjPmLxF1TiSSr6RbQtQ95L7UbZI\naa//C3vWA71zN1U6cIrD2guJesSTaZ35wCXftqZ337503S7gr9viZUfGO44d6JJ5\n5zpeZ0dubLivv+pXDSX7O4ucsNSx5vzYY3mxQG+SBG6K9IgWSosDhljwxMqMxUBB\nlYlyKMwo1eIMGKyhRE/PULe5Isa/vEbInQF7havwkVHMHZ1uo1j3zqrpsZCAio1X\nysP1dGRNJYk1913SeLtkw9gyspgXSNIj47dZDWgbKWfE5dFkBBNkGLOE/e0MrACb\nJ9dwL8qGYPsBcn1IxWUJb5T9+dwsjsf5O9Iz2YgyoQKBgQD2E84WctGppoyQ1ON+\nUEjDwVa7Fhq5CtMGsam2fhi7OEpxNhSzRxj3Zw/2fPJzUqmaxD5F8ZIlTifbABCE\nZ7rfSO5nEI4+LQx+v06ZwtEaHiKOGs/+UoR8tNJHtR6CfjsR3kHDCVBo5FVnNbMV\nbwxNs5HZnaerHpNQTWHUaVbTiQKBgQDqebH2s+cjIYkvKV025pWpQKOWdQUGDdEG\nBIggrbgECRfpBnb8qAsN7ifl3sPuKDk1m6pNq1Z/1G/O4AqRjKwkbcOb43wAlMgY\nD/kEU+pfqn2HB+ZEdP3ekVmda9hZWPVKOy+2jHxoVSmcI9O98cUff5fkJSinoBr3\noL0dUk3YIwKBgE0X31UBG9Z+q0MkrzD/jgxmIfny7uRSE9LhDj5yOuVMuWXGf626\n9INt8n5SntKqbyBhovDewd6WIb5mwsX4iX8yph37/dRU4LlEzic19bStBD5pAAi5\naXB4Zfi5MZnIWlE6xHeKD3sNLgRrunNYmw4s1+DJl6Hwrk5WL/QQHHehAoGBAMAD\nurZiK0V8wCAsCpbcC/GX6p9a4ytLA0KfUW8ZdBlx7O+6iJRtdOgKgQfg/qi4rej1\numhyiJqUOJ+8n0sEXTBT5x1xFGpRbO8vnWhq5ANF1hhPYsXq3L94Xl/pIjpA/Fa2\n02L19ydlnnasbEkfhaM+1P9TYtCq74qcSmKJtQ/rAoGBANIHXyusFDD96sWslU9H\nK4B9NhR3fEAO2U4a34OBv/lTwwHTBI1K3LmCS83O/MhYMmGcsRgy6qzLLR1wa2hW\nAEsDnfiUpl9rxW8+uaoJRpYy6QhwITjmYbjzs7NnhTSkUJDThv2LCjhPkLVQXW9P\nD22mMLLO5SnARilGV4/EM7wR\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@nowstadt.iam.gserviceaccount.com",
+  "client_id": "112816529323424550585",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40nowstadt.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
